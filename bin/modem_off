@@ -33,9 +33,11 @@ function exit_if_already_off {
 }
 
 function power_off {
-  # Make POWER_KEY_PIN high to tun off module
+  # Make POWER_KEY high to turn off module (toggle)
   echo 1 > ${POWER_KEY_PIN}/value
-  sleep 1.5
+  sleep 2.5
+  # Make POWER_KEY low after shutting down
+  echo 0 > ${POWER_KEY_PIN}/value
 }
 
 function modem_off {
