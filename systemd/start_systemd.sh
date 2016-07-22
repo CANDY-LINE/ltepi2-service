@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+
+PRODUCT="LTEPi-II Board"
+MODULE_SUPPORTED=0
+MODEM_SERIAL_PORT=""
+
+function look_for_serial_port {
+  MODEM_SERIAL_PORT=`/usr/bin/env python -c "import candy_board_amt; print(candy_board_amt.SerialPort.resolve_modem_port())"`
+}
+
+function try_to_change_usb_data_conn {
+  RET=`lsusb | grep 1ecb:0202`
+  RET=$?
+  if [ "${RET}" != "0" ]; then
+    return
+  fi
+  # Change to ECM
+  logger -s "Modifying the USB data connection I/F to ECM"
+  /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init
+  logger -s "*** Rebooting... ***"
+  reboot
+}
+
+function wait_for_ecm_enabled {
+  MAX=10
+  COUNTER=0
+  while [ ${COUNTER} -lt ${MAX} ];
+  do
+    RET=`lsusb | grep 1ecb:0208`
+    RET=$?
+    if [ ${RET} == "0" ]; then
+      break
+    fi
+    sleep 1
+    let COUNTER=COUNTER+1
+  done
+
+}
+
+function diagnose_self {
+  if [ -z "${MODEM_SERIAL_PORT}" ]; then
+    return
+  fi
+
+  RET=`dmesg | grep "register 'cdc_ether'"`
+  RET=$?
+  if [ "${RET}" != "0" ]; then
+    try_to_change_usb_data_conn # may reboot
+  fi
+
+  wait_for_ecm_enabled
+  RET=`lsusb | grep 1ecb:0208`
+  RET=$?
+  if [ "${RET}" == "0" ]; then
+    MODULE_SUPPORTED=1
+  fi
+}
+
+# LTE/3G USB Ethernet
+function activate_lte {
+  if [ "${MODULE_SUPPORTED}" != "1" ]; then
+    return
+  fi
+
+  logger -s "Activating LTE/3G Module..."
+  USB_ID=`dmesg | grep "New USB device found, idVendor=1ecb, idProduct=0208" | sed 's/^.*\] //g' | cut -f 1 -d ':' | cut -f 2 -d ' ' | tail -1`
+  # when renamed
+  IF_NAME=`dmesg | grep "renamed network interface usb1" | sed 's/^.* usb1 to //g' | cut -f 1 -d ' ' | tail -1`
+  if [ -z "${IF_NAME}" ]; then
+    IF_NAME=`dmesg | grep " ${USB_ID}" | grep "register 'cdc_ether'" | cut -f 2 -d ':' | cut -f 2 -d ' ' | tail -1`
+  fi
+  if [ -n "${IF_NAME}" ]; then
+    ifconfig ${IF_NAME} up
+    logger -s "The interface [${IF_NAME}] is up!"
+    # Registering a new id
+    modprobe usbserial vendor=0x1ecb product=0x0208
+    RET=$?
+    if [ "${RET}" != "0" ]; then
+      if [ -e "/sys/bus/usb-serial/drivers/pl2303" ]; then
+        echo "1ecb 0208" > /sys/bus/usb-serial/drivers/pl2303/new_id
+      fi
+    fi
+
+  else
+    IF_NAME=""
+  fi
+}
+
+# start banner
+logger -s "Initializing ${PRODUCT}..."
+
+/opt/candy-line/ltepi2/bin/modem_on > /dev/null 2>&1
+look_for_serial_port
+diagnose_self
+activate_lte
+
+# end banner
+if [ "${MODULE_SUPPORTED}" == "1" ]; then
+  logger -s "${PRODUCT} is initialized successfully!"
+  /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} ${IF_NAME}
+else
+  logger -s "${PRODUCT} is not initialized... Silently terminated"
+fi
