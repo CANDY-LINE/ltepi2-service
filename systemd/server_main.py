@@ -20,17 +20,19 @@ import candy_board_amt
 # sys.argv[2] ... The network interface name to be monitored
 
 class Monitor(threading.Thread):
+    FNULL = open(os.devnull, 'w')
+
     def __init__(self, nic):
         super(Monitor, self).__init__()
         self.nic = nic
 
     def run(self):
         while True:
-            err = subprocess.call("ip route | grep %s" % self.nic, shell=True)
+            err = subprocess.call("ip route | grep %s" % self.nic, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
             if err != 0:
                 print("LTEPi-II modem is terminated. Shutting down.")
                 break
-            err = subprocess.call("ip route | grep default | grep -v %s" % self.nic, shell=True)
+            err = subprocess.call("ip route | grep default | grep -v %s" % self.nic, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
             if err == 0:
                 ls_nic_cmd = "ip route | grep default | grep -v %s | tr -s ' ' | cut -d ' ' -f 5" % self.nic
                 ls_nic = subprocess.Popen(ls_nic_cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
