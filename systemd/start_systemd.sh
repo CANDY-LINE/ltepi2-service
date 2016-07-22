@@ -1,31 +1,30 @@
 #!/usr/bin/env bash
 
 PRODUCT="LTEPi-II Board"
-MODULE_SUPPORTED=0
+MODEM_USB_MODE=""
 MODEM_SERIAL_PORT=""
 
-function look_for_serial_port {
+function wait_for_modem_usb_active {
   MAX=20
   COUNTER=0
   while [ ${COUNTER} -lt ${MAX} ];
   do
     RET=`lsusb | grep 1ecb:0208`
     if [ "$?" == "0" ]; then
-      COUNTER=0
+      MODEM_USB_MODE="ECM"
       break
     fi
     RET=`lsusb | grep 1ecb:0202`
     if [ "$?" == "0" ]; then
-      COUNTER=0
+      MODEM_USB_MODE="ACM"
       break
     fi
     sleep 0.5
     let COUNTER=COUNTER+1
   done
-  if [ ${COUNTER} == "${MAX}" ]; then
-    return
-  fi
+}
 
+function look_for_serial_port {
   MAX=60
   COUNTER=0
   while [ ${COUNTER} -lt ${MAX} ];
@@ -41,11 +40,6 @@ function look_for_serial_port {
 }
 
 function try_to_change_usb_data_conn {
-  RET=`lsusb | grep 1ecb:0202`
-  RET=$?
-  if [ "${RET}" != "0" ]; then
-    return
-  fi
   # Change to ECM
   logger -s "Modifying the USB data connection I/F to ECM"
   /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init
@@ -53,44 +47,21 @@ function try_to_change_usb_data_conn {
   reboot
 }
 
-function wait_for_ecm_enabled {
-  MAX=10
-  COUNTER=0
-  while [ ${COUNTER} -lt ${MAX} ];
-  do
-    RET=`lsusb | grep 1ecb:0208`
-    RET=$?
-    if [ ${RET} == "0" ]; then
-      break
-    fi
-    sleep 1
-    let COUNTER=COUNTER+1
-  done
-
-}
-
 function diagnose_self {
-  if [ -z "${MODEM_SERIAL_PORT}" ]; then
+  wait_for_modem_usb_active
+  if [ -z "${MODEM_USB_MODE}" ]; then
     return
   fi
 
-  RET=`dmesg | grep "register 'cdc_ether'"`
-  RET=$?
-  if [ "${RET}" != "0" ]; then
+  if [ "${MODEM_USB_MODE}" == "ACM" ]; then
+    look_for_serial_port
     try_to_change_usb_data_conn # may reboot
-  fi
-
-  wait_for_ecm_enabled
-  RET=`lsusb | grep 1ecb:0208`
-  RET=$?
-  if [ "${RET}" == "0" ]; then
-    MODULE_SUPPORTED=1
   fi
 }
 
 # LTE/3G USB Ethernet
 function activate_lte {
-  if [ "${MODULE_SUPPORTED}" != "1" ]; then
+  if [ -z "${MODEM_USB_MODE}" ]; then
     return
   fi
 
@@ -112,6 +83,7 @@ function activate_lte {
         echo "1ecb 0208" > /sys/bus/usb-serial/drivers/pl2303/new_id
       fi
     fi
+    look_for_serial_port
 
   else
     IF_NAME=""
@@ -122,12 +94,11 @@ function activate_lte {
 logger -s "Initializing ${PRODUCT}..."
 
 /opt/candy-line/ltepi2/bin/modem_on > /dev/null 2>&1
-look_for_serial_port
 diagnose_self
 activate_lte
 
 # end banner
-if [ "${MODULE_SUPPORTED}" == "1" ]; then
+if [ "${MODEM_USB_MODE}" == "ECM" ]; then
   logger -s "${PRODUCT} is initialized successfully!"
   /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} ${IF_NAME}
 else
