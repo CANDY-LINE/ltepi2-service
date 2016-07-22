@@ -23,7 +23,7 @@ function inactivate_lte {
     return
   fi
 
-  logger -s "Inactivating LTE/3G Module..."
+  logger -t ltepi2 "Inactivating LTE/3G Module..."
   USB_ID=`dmesg | grep "New USB device found, idVendor=1ecb, idProduct=0208" | sed 's/^.*\] //g' | cut -f 1 -d ':' | cut -f 2 -d ' ' | tail -1`
   IF_NAME=`dmesg | grep " ${USB_ID}" | grep "register 'cdc_ether'" | cut -f 2 -d ':' | cut -f 2 -d ' ' | tail -1`
   if [ -z "${IF_NAME}" ]; then
@@ -32,7 +32,7 @@ function inactivate_lte {
   fi
   if [ -n "${IF_NAME}" ]; then
     ifconfig ${IF_NAME} down
-    logger -s "The interface [${IF_NAME}] is down!"
+    logger -t ltepi2 "The interface [${IF_NAME}] is down!"
 
     RET=`ifconfig | grep wlan0`
     RET=$?
@@ -44,11 +44,11 @@ function inactivate_lte {
 }
 
 # start banner
-logger -s "Inactivating ${PRODUCT}..."
+logger -t ltepi2 "Inactivating ${PRODUCT}..."
 
 diagnose_self
 inactivate_lte
 /opt/candy-line/ltepi2/bin/modem_off > /dev/null 2>&1
 
 # end banner
-logger -s "${PRODUCT} is inactivated successfully!"
+logger -t ltepi2 "${PRODUCT} is inactivated successfully!"
