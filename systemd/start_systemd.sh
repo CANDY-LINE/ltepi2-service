@@ -5,7 +5,39 @@ MODULE_SUPPORTED=0
 MODEM_SERIAL_PORT=""
 
 function look_for_serial_port {
-  MODEM_SERIAL_PORT=`/usr/bin/env python -c "import candy_board_amt; print(candy_board_amt.SerialPort.resolve_modem_port())"`
+  MAX=20
+  COUNTER=0
+  while [ ${COUNTER} -lt ${MAX} ];
+  do
+    RET=`lsusb | grep 1ecb:0208`
+    if [ "$?" == "0" ]; then
+      COUNTER=0
+      break
+    fi
+    RET=`lsusb | grep 1ecb:0202`
+    if [ "$?" == "0" ]; then
+      COUNTER=0
+      break
+    fi
+    sleep 0.5
+    let COUNTER=COUNTER+1
+  done
+  if [ ${COUNTER} == "${MAX}" ]; then
+    return
+  fi
+
+  MAX=60
+  COUNTER=0
+  while [ ${COUNTER} -lt ${MAX} ];
+  do
+    MODEM_SERIAL_PORT=`/usr/bin/env python -c "import candy_board_amt; print(candy_board_amt.SerialPort.resolve_modem_port())"`
+    if [ "${MODEM_SERIAL_PORT}" != "None" ]; then
+      COUNTER=0
+      break
+    fi
+    sleep 1
+    let COUNTER=COUNTER+1
+  done
 }
 
 function try_to_change_usb_data_conn {
