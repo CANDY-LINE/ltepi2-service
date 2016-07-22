@@ -51,6 +51,7 @@ function uninstall_service {
   rm -f ${SERVICE_HOME}/*.sh
   rm -f ${SERVICE_HOME}/*.py
   rm -f ${SERVICE_HOME}/*.pyc
+  systemctl daemon-reload
   info "${SERVICE_NAME} has been uninstalled"
   REBOOT=1
 }
