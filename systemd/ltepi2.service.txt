@@ -1,5 +1,5 @@
 [Unit]
-Description=LTEPi II Service, version:%VERSION%
+Description=LTEPi-II Service, version:%VERSION%
 After=wpa_supplicant.service
 Before=
 
