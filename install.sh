@@ -75,8 +75,8 @@ function install_bin {
 }
 
 function install_candy_board {
-  pip install candy-board-cli
-  pip install candy-board-amt
+  pip install --upgrade candy-board-cli
+  pip install --upgrade candy-board-amt
 }
 
 function install_candy_red {
