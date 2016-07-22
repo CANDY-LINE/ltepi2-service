@@ -32,7 +32,7 @@ class Monitor(threading.Thread):
                 break
             err = subprocess.call("ip route | grep default | grep -v %s" % self.nic, shell=True)
             if err == 0:
-                ls_nic_cmd = "ip route    | grep default | grep -v %s | tr -s ' ' | cut -d ' ' -f 5" % self.nic
+                ls_nic_cmd = "ip route | grep default | grep -v %s | tr -s ' ' | cut -d ' ' -f 5" % self.nic
                 ls_nic = subprocess.Popen(ls_nic_cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
                 for nic in ls_nic.split("\n"):
                     if nic:
