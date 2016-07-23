@@ -47,6 +47,20 @@ function try_to_change_usb_data_conn {
   reboot
 }
 
+function wait_for_default_route {
+  MAX=60
+  COUNTER=0
+  while [ ${COUNTER} -lt ${MAX} ];
+  do
+    RET=`ip route | grep ${IF_NAME}`
+    if [ "$?" == "0" ]; then
+      break
+    fi
+    sleep 0.5
+    let COUNTER=COUNTER+1
+  done
+}
+
 function diagnose_self {
   wait_for_modem_usb_active
   if [ -z "${MODEM_USB_MODE}" ]; then
@@ -84,6 +98,7 @@ function activate_lte {
       fi
     fi
     look_for_serial_port
+    wait_for_default_route
 
   else
     IF_NAME=""
@@ -93,7 +108,7 @@ function activate_lte {
 # start banner
 logger -t ltepi2 "Initializing ${PRODUCT}..."
 
-/opt/candy-line/ltepi2/bin/modem_on > /dev/null 2>&1
+/opt/candy-line/ltepi2/_modem_on.sh > /dev/null 2>&1
 diagnose_self
 activate_lte
 

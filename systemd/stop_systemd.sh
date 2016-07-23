@@ -3,6 +3,23 @@
 PRODUCT="LTEPi-II Board"
 MODULE_SUPPORTED=0
 
+function wait_for_modem_usb_inactive {
+  MAX=30
+  COUNTER=0
+  while [ ${COUNTER} -lt ${MAX} ];
+  do
+    RET=`lsusb | grep 1ecb:0208`
+    if [ "$?" != "0" ]; then
+      RET=`lsusb | grep 1ecb:0202`
+      if [ "$?" != "0" ]; then
+        break
+      fi
+    fi
+    sleep 1
+    let COUNTER=COUNTER+1
+  done
+}
+
 function diagnose_self {
   RET=`dmesg | grep "register 'cdc_ether'"`
   RET=$?
@@ -48,7 +65,8 @@ logger -t ltepi2 "Inactivating ${PRODUCT}..."
 
 diagnose_self
 inactivate_lte
-/opt/candy-line/ltepi2/bin/modem_off > /dev/null 2>&1
+/opt/candy-line/ltepi2/_modem_off.sh > /dev/null 2>&1
+wait_for_modem_usb_inactive
 
 # end banner
 logger -t ltepi2 "${PRODUCT} is inactivated successfully!"
