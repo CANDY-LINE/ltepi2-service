@@ -1,2 +1,5 @@
 # Environment Variables
+# Software Version
 VERSION=%VERSION%
+# 1 for enabling LED blinking, 0 for disabling it
+BLINKY=1

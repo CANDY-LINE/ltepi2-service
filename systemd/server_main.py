@@ -27,6 +27,7 @@ handler = logging.handlers.SysLogHandler(address = '/dev/log')
 logger.addHandler(handler)
 formatter = logging.Formatter('%(module)s.%(funcName)s: %(message)s')
 handler.setFormatter(formatter)
+led = 0
 
 class Monitor(threading.Thread):
     FNULL = open(os.devnull, 'w')
@@ -95,6 +96,12 @@ def modem_reset(serial_port, sock_path):
     logger.debug("modem_init() : modem, enable_acm => %s" % ret)
     sys.exit(json.loads(ret)['status'] != 'OK')
 
+def blinky():
+    global led
+    led = 0 if led != 0 else 1
+    subprocess.call("echo %d > /sys/class/gpio/gpio4/value" % led, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
+    threading.Timer(1, blinky, ()).start()
+
 def server_main(serial_port, nic, sock_path='/var/run/candy-board-service.sock'):
     delete_sock_path(sock_path)
     atexit.register(delete_sock_path, sock_path)
@@ -109,6 +116,10 @@ def server_main(serial_port, nic, sock_path='/var/run/candy-board-service.sock')
     server = candy_board_amt.SockServer(resolve_version(), resolve_boot_apn(), sock_path, serial)
     if 'DEBUG' in os.environ and os.environ['DEBUG'] == "1":
         server.debug = True
+
+    if 'BLINKY' in os.environ and os.environ['BLINKY'] == "1":
+        logger.debug("server_main() : Starting blinky timer...")
+        blinky()
 
     logger.debug("server_main() : Starting SockServer...")
     server.start()
