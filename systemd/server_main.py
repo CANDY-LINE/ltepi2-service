@@ -79,6 +79,7 @@ def resolve_boot_apn():
         return None
     with open(apn_json) as apn_creds:
         apn = json.load(apn_creds)
+    os.remove(apn_json)
     return apn
 
 def modem_init(serial_port, sock_path):
