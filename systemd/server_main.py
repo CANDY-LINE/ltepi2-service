@@ -29,6 +29,9 @@ logger.addHandler(handler)
 formatter = logging.Formatter('%(module)s.%(funcName)s: %(message)s')
 handler.setFormatter(formatter)
 led = 0
+led_sec = float(os.environ['BLINKY_INTERVAL_SEC']) if 'BLINKY_INTERVAL_SEC' in os.environ else 1.0
+if led_sec < 0 or led_sec > 60:
+    led_sec = 1.0
 
 class Monitor(threading.Thread):
     FNULL = open(os.devnull, 'w')
@@ -89,10 +92,10 @@ def modem_init(serial_port, sock_path):
     sys.exit(json.loads(ret)['status'] != 'OK')
 
 def blinky():
-    global led
+    global led, led_sec
     led = 0 if led != 0 else 1
     subprocess.call("echo %d > /sys/class/gpio/gpio4/value" % led, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
-    threading.Timer(1, blinky, ()).start()
+    threading.Timer(led_sec, blinky, ()).start()
 
 def server_main(serial_port, nic, sock_path='/var/run/candy-board-service.sock'):
     delete_sock_path(sock_path)
