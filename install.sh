@@ -155,7 +155,7 @@ function install_service {
 function teardown {
   [ "${DEBUG}" ] || rm -fr ${SRC_DIR}
   if [ "${CONTAINER_MODE}" == "0" ] && [ "${REBOOT}" == "1" ]; then
-    alert "*** Please shutdown the system then restart! (enter 'sudo shutdown -h now' first) ***"
+    alert "*** Please reboot the system (enter 'sudo reboot') ***"
   fi
 }
 
