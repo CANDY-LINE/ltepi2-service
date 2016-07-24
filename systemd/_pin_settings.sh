@@ -35,6 +35,6 @@ RI=16
 RI_PIN="/sys/class/gpio/gpio${RI}"
 RI_DIR="${RI_PIN}/direction"
 
-LED2=7
+LED2=4
 LED2_PIN="/sys/class/gpio/gpio${LED2}"
 LED2_DIR="${LED2_PIN}/direction"

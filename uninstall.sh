@@ -4,7 +4,6 @@ VENDOR_HOME=/opt/candy-line
 
 SERVICE_NAME=ltepi2
 SERVICE_HOME=${VENDOR_HOME}/ltepi2
-BIN_PATH=${SERVICE_HOME}/bin
 
 REBOOT=0
 
@@ -27,11 +26,6 @@ function assert_root {
   fi
 }
 
-function uninstall_bin {
-  rm -fr ${BIN_PATH}
-  rm -f ${SERVICE_HOME}/*.json
-}
-
 function uninstall_candy_board {
   pip uninstall -y candy-board-amt
   pip uninstall -y candy-board-cli
@@ -51,6 +45,7 @@ function uninstall_service {
   rm -f ${SERVICE_HOME}/*.sh
   rm -f ${SERVICE_HOME}/*.py
   rm -f ${SERVICE_HOME}/*.pyc
+  rm -f ${SERVICE_HOME}/*.json
   systemctl daemon-reload
   info "${SERVICE_NAME} has been uninstalled"
   REBOOT=1
@@ -67,6 +62,5 @@ function teardown {
 # main
 assert_root
 uninstall_service
-uninstall_bin
 uninstall_candy_board
 teardown

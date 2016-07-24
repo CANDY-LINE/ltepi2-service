@@ -41,10 +41,24 @@ function look_for_serial_port {
 
 function try_to_change_usb_data_conn {
   # Change to ECM
-  logger -s "Modifying the USB data connection I/F to ECM"
+  logger -t ltepi2 "Modifying the USB data connection I/F to ECM"
   /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init
-  logger -s "*** Rebooting... ***"
+  logger -t ltepi2 "*** Rebooting... ***"
   reboot
+}
+
+function wait_for_default_route {
+  MAX=60
+  COUNTER=0
+  while [ ${COUNTER} -lt ${MAX} ];
+  do
+    RET=`ip route | grep ${IF_NAME}`
+    if [ "$?" == "0" ]; then
+      break
+    fi
+    sleep 0.5
+    let COUNTER=COUNTER+1
+  done
 }
 
 function diagnose_self {
@@ -65,7 +79,7 @@ function activate_lte {
     return
   fi
 
-  logger -s "Activating LTE/3G Module..."
+  logger -t ltepi2 "Activating LTE/3G Module..."
   USB_ID=`dmesg | grep "New USB device found, idVendor=1ecb, idProduct=0208" | sed 's/^.*\] //g' | cut -f 1 -d ':' | cut -f 2 -d ' ' | tail -1`
   # when renamed
   IF_NAME=`dmesg | grep "renamed network interface usb1" | sed 's/^.* usb1 to //g' | cut -f 1 -d ' ' | tail -1`
@@ -74,7 +88,7 @@ function activate_lte {
   fi
   if [ -n "${IF_NAME}" ]; then
     ifconfig ${IF_NAME} up
-    logger -s "The interface [${IF_NAME}] is up!"
+    logger -t ltepi2 "The interface [${IF_NAME}] is up!"
     # Registering a new id
     modprobe usbserial vendor=0x1ecb product=0x0208
     RET=$?
@@ -84,6 +98,7 @@ function activate_lte {
       fi
     fi
     look_for_serial_port
+    wait_for_default_route
 
   else
     IF_NAME=""
@@ -91,16 +106,16 @@ function activate_lte {
 }
 
 # start banner
-logger -s "Initializing ${PRODUCT}..."
+logger -t ltepi2 "Initializing ${PRODUCT}..."
 
-/opt/candy-line/ltepi2/bin/modem_on > /dev/null 2>&1
+/opt/candy-line/ltepi2/_modem_on.sh > /dev/null 2>&1
 diagnose_self
 activate_lte
 
 # end banner
 if [ "${MODEM_USB_MODE}" == "ECM" ]; then
-  logger -s "${PRODUCT} is initialized successfully!"
+  logger -t ltepi2 "${PRODUCT} is initialized successfully!"
   /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} ${IF_NAME}
 else
-  logger -s "${PRODUCT} is not initialized... Silently terminated"
+  logger -t ltepi2 "${PRODUCT} is not initialized... Silently terminated"
 fi
