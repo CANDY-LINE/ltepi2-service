@@ -129,7 +129,7 @@ if __name__ == '__main__':
         if sys.argv[3] == 'init':
             modem_init(sys.argv[1], sys.argv[2])
         else:
-            modem_reset(sys.argv[1], sys.argv[2])
+            logger.error("Do nothing: sys.argv[3]=%s" % sys.argv[3])
     else:
         logger.info("serial_port:%s, nic:%s" % (sys.argv[1], sys.argv[2]))
         server_main(sys.argv[1], sys.argv[2])
