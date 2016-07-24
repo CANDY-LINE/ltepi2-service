@@ -3,6 +3,7 @@
 import fcntl
 import json
 import os
+import signal
 import socket
 import select
 import struct
@@ -41,7 +42,8 @@ class Monitor(threading.Thread):
             err = subprocess.call("ip route | grep %s" % self.nic, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
             if err != 0:
                 logger.error("LTEPi-II modem is terminated. Shutting down.")
-                sys.exit(1)
+                os.kill(os.getpid(), signal.SIGINT) # exit from non-main thread
+                break
             err = subprocess.call("ip route | grep default | grep -v %s" % self.nic, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
             if err == 0:
                 ls_nic_cmd = "ip route | grep default | grep -v %s | tr -s ' ' | cut -d ' ' -f 5" % self.nic
@@ -131,4 +133,7 @@ if __name__ == '__main__':
             logger.error("Do nothing: sys.argv[3]=%s" % sys.argv[3])
     else:
         logger.info("serial_port:%s, nic:%s" % (sys.argv[1], sys.argv[2]))
-        server_main(sys.argv[1], sys.argv[2])
+        try:
+            server_main(sys.argv[1], sys.argv[2])
+        except KeyboardInterrupt:
+            pass
