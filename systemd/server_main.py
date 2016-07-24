@@ -90,16 +90,6 @@ def modem_init(serial_port, sock_path):
     logger.debug("modem_init() : modem, enable_ecm => %s" % ret)
     sys.exit(json.loads(ret)['status'] != 'OK')
 
-def modem_reset(serial_port, sock_path):
-    delete_sock_path(sock_path)
-    atexit.register(delete_sock_path, sock_path)
-
-    serial = candy_board_amt.SerialPort(serial_port, 115200)
-    server = candy_board_amt.SockServer(resolve_version(), resolve_boot_apn(), sock_path, serial)
-    ret = server.perform({'category':'modem', 'action':'enable_acm'})
-    logger.debug("modem_init() : modem, enable_acm => %s" % ret)
-    sys.exit(json.loads(ret)['status'] != 'OK')
-
 def blinky():
     global led
     led = 0 if led != 0 else 1
