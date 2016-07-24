@@ -6,3 +6,6 @@ VERSION=%VERSION%
 BLINKY=1
 # Blinking interval in seconds, > 0 and <= 60
 BLINKY_INTERVAL_SEC=0.4
+
+# 1 for enabling fast-shutdown ('systemctl restart' should always fail though)
+FAST_SHUTDOWN=0

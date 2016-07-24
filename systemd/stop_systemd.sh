@@ -9,6 +9,10 @@ function led_off {
 }
 
 function wait_for_modem_usb_inactive {
+  if [ "${FAST_SHUTDOWN}" == "1" ]; then
+    logger -t ltepi2 "[FAST_SHUTDOWN] Skipping to monitor USB status..."
+    return
+  fi
   MAX=30
   COUNTER=0
   while [ ${COUNTER} -lt ${MAX} ];
