@@ -55,6 +55,10 @@ class Monitor(threading.Thread):
             time.sleep(5)
 
 def delete_sock_path(sock_path):
+    # turn LED off
+    led = 1
+    blinky()
+    # remove sock_path
     try:
         os.unlink(sock_path)
     except OSError:
