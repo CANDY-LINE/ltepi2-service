@@ -3,6 +3,11 @@
 PRODUCT="LTEPi-II Board"
 MODULE_SUPPORTED=0
 
+function led_off {
+  . /opt/candy-line/ltepi2/_pin_settings.sh > /dev/null 2>&1
+  echo 0 > ${LED2_PIN}/value
+}
+
 function wait_for_modem_usb_inactive {
   MAX=30
   COUNTER=0
@@ -67,6 +72,7 @@ diagnose_self
 inactivate_lte
 /opt/candy-line/ltepi2/_modem_off.sh > /dev/null 2>&1
 wait_for_modem_usb_inactive
+led_off
 
 # end banner
 logger -t ltepi2 "${PRODUCT} is inactivated successfully!"
