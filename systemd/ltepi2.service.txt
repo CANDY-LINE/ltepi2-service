@@ -1,0 +1,17 @@
+[Unit]
+Description=LTEPi-II Service, version:%VERSION%
+After=wpa_supplicant.service
+Before=
+
+[Service]
+Type=simple
+RemainAfterExit=no
+Restart=on-failure
+ExecStart=/opt/candy-line/ltepi2/start_systemd.sh
+ExecStop=/opt/candy-line/ltepi2/stop_systemd.sh
+Environment="HOME=/opt/candy-line/ltepi2/"
+WorkingDirectory=/opt/candy-line/ltepi2/
+EnvironmentFile=/opt/candy-line/ltepi2/environment
+
+[Install]
+WantedBy=multi-user.target
