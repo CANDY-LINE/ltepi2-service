@@ -166,7 +166,7 @@ APN設定方法には、他にファイルを使用した方法もあります�
 
 コマンドによるAPN設定のほか、あらかじめJSONファイルにAPNを書いておき、それを読み込ませる方法によってAPN設定を変更することもできます。
 
-まずは以下のようなJSONファイルを作成します。ファイル名は、`boot-apn.json`とし、`/opt/candy-line/ltepi`ディレクトリーに保存します。
+まずは以下のようなJSONファイルを作成します。ファイル名は、`boot-apn.json`とし、`/opt/candy-line/ltepi2`ディレクトリーに保存します。
 ```
 {"apn":"APN名","user":"APNユーザーID","password":"APNパスワード"}
 ```
@@ -222,7 +222,7 @@ $ sudo /opt/candy-line/ltepi2/uninstall.sh
 ```bash
 $ cd ~
 $ sudo /opt/candy-line/ltepi2/uninstall.sh
-Removed symlink /etc/systemd/system/multi-user.target.wants/ltepi.service.
+Removed symlink /etc/systemd/system/multi-user.target.wants/ltepi2.service.
 [INFO] ltepi2 has been uninstalled
 Uninstalling candy-board-amt:
   Successfully uninstalled candy-board-amt
