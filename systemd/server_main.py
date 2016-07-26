@@ -45,7 +45,7 @@ class Monitor(threading.Thread):
             err = subprocess.call("ip route | grep %s" % self.nic, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
             if err != 0:
                 logger.error("LTEPi-II modem is terminated. Shutting down.")
-                os.kill(os.getpid(), signal.SIGINT) # exit from non-main thread
+                os.kill(os.getpid(), signal.SIGTERM) # exit from non-main thread
                 break
             err = subprocess.call("ip route | grep default | grep -v %s" % self.nic, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
             if err == 0:
