@@ -410,5 +410,7 @@ $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 ```
 
 # 履歴
+* 1.0.1
+    - AMP520において、自動接続モードがデフォルトで有効になるように修正
 * 1.0.0
     - 初版

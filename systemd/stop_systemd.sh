@@ -75,8 +75,9 @@ logger -t ltepi2 "Inactivating ${PRODUCT}..."
 diagnose_self
 inactivate_lte
 /opt/candy-line/ltepi2/_modem_off.sh > /dev/null 2>&1
-wait_for_modem_usb_inactive
 led_off
+wait_for_modem_usb_inactive
+led_off # ensure LED off
 
 # end banner
 logger -t ltepi2 "${PRODUCT} is inactivated successfully!"
