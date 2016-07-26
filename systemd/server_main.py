@@ -45,7 +45,7 @@ class Monitor(threading.Thread):
             err = subprocess.call("ip route | grep %s" % self.nic, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
             if err != 0:
                 logger.error("LTEPi-II modem is terminated. Shutting down.")
-                os.kill(os.getpid(), signal.SIGINT) # exit from non-main thread
+                os.kill(os.getpid(), signal.SIGTERM) # exit from non-main thread
                 break
             err = subprocess.call("ip route | grep default | grep -v %s" % self.nic, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
             if err == 0:
@@ -82,15 +82,31 @@ def resolve_boot_apn():
     os.remove(apn_json)
     return apn
 
-def modem_init(serial_port, sock_path):
+def modem_init1(serial_port, sock_path):
     delete_sock_path(sock_path)
     atexit.register(delete_sock_path, sock_path)
 
     serial = candy_board_amt.SerialPort(serial_port, 115200)
     server = candy_board_amt.SockServer(resolve_version(), resolve_boot_apn(), sock_path, serial)
     ret = server.perform({'category':'modem', 'action':'enable_ecm'})
-    logger.debug("modem_init() : modem, enable_ecm => %s" % ret)
+    logger.debug("modem_init1() : modem, enable_ecm => %s" % ret)
     sys.exit(json.loads(ret)['status'] != 'OK')
+
+def modem_init2(serial_port, sock_path):
+    delete_sock_path(sock_path)
+    atexit.register(delete_sock_path, sock_path)
+
+    serial = candy_board_amt.SerialPort(serial_port, 115200)
+    server = candy_board_amt.SockServer(resolve_version(), resolve_boot_apn(), sock_path, serial)
+    ret = server.perform({'category':'modem', 'action':'enable_auto_connect'})
+    logger.debug("modem_init2() : modem, enable_auto_connect => %s" % ret)
+    ret = json.loads(ret)
+    if ret['status'] == 'OK':
+        if ret['result'] == 'Already Enabled':
+            sys.exit(0)
+        else:
+            sys.exit(1)
+    sys.exit(2)
 
 def blinky():
     global led, led_sec
@@ -128,8 +144,10 @@ if __name__ == '__main__':
     if len(sys.argv) < 3:
         logger.error("USB Ethernet Network Interface isn't ready. Shutting down.")
     elif len(sys.argv) > 3:
-        if sys.argv[3] == 'init':
-            modem_init(sys.argv[1], sys.argv[2])
+        if sys.argv[3] == 'init1':
+            modem_init1(sys.argv[1], sys.argv[2])
+        elif sys.argv[3] == 'init2':
+            modem_init2(sys.argv[1], sys.argv[2])
         else:
             logger.error("Do nothing: sys.argv[3]=%s" % sys.argv[3])
     else:
