@@ -24,6 +24,23 @@ function wait_for_modem_usb_active {
   done
 }
 
+function wait_for_modem_usb_inactive {
+  MAX=40
+  COUNTER=0
+  while [ ${COUNTER} -lt ${MAX} ];
+  do
+    RET=`lsusb | grep 1ecb:0208`
+    if [ "$?" != "0" ]; then
+      RET=`lsusb | grep 1ecb:0202`
+      if [ "$?" != "0" ]; then
+        break
+      fi
+    fi
+    sleep 0.5
+    let COUNTER=COUNTER+1
+  done
+}
+
 function look_for_serial_port {
   MAX=60
   COUNTER=0
@@ -39,12 +56,24 @@ function look_for_serial_port {
   done
 }
 
-function try_to_change_usb_data_conn {
-  # Change to ECM
+function change_usb_data_conn {
   logger -t ltepi2 "Modifying the USB data connection I/F to ECM"
-  /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init
-  logger -t ltepi2 "*** Rebooting... ***"
-  reboot
+  /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init1
+  RET=$?
+  if [ "${RET}" == "0" ]; then
+    logger -t ltepi2 "*** Restarting modem... ***"
+  else
+    exit ${RET}
+  fi
+}
+
+function enable_auto_connect {
+  logger -t ltepi2 "Enabling auto-connect mode"
+  /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init2
+  RET=$?
+  if [ "${RET}" != "0" ]; then
+    exit ${RET}
+  fi
 }
 
 function wait_for_default_route {
@@ -68,8 +97,23 @@ function diagnose_self {
   fi
 
   if [ "${MODEM_USB_MODE}" == "ACM" ]; then
+    MODEM_USB_MODE=""
+
     look_for_serial_port
-    try_to_change_usb_data_conn # may reboot
+    change_usb_data_conn
+    wait_for_modem_usb_inactive
+    wait_for_modem_usb_active
+    if [ -z "${MODEM_USB_MODE}" ]; then
+      return
+    fi
+
+    look_for_serial_port
+    enable_auto_connect
+    wait_for_modem_usb_inactive
+    wait_for_modem_usb_active
+    if [ -z "${MODEM_USB_MODE}" ]; then
+      return
+    fi
   fi
 }
 
