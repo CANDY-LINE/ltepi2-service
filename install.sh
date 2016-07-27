@@ -4,7 +4,7 @@ VENDOR_HOME=/opt/candy-line
 
 SERVICE_NAME=ltepi2
 GITHUB_ID=CANDY-LINE/ltepi2-service
-VERSION=1.0.2
+VERSION=1.0.3
 
 NODEJS_VERSIONS="v0.12 v4.4"
 
@@ -111,7 +111,7 @@ function install_candy_red {
       apt-get install -y nodejs
     fi
   fi
-  apt-get install -y python-dev python-rpi.gpio bluez
+  apt-get install -y python-dev python-rpi.gpio bluez libudev-dev
   cd ~
   NODE_OPTS=--max-old-space-size=128 npm install -g --unsafe-perm candy-red
   REBOOT=1

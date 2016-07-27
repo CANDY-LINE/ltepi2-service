@@ -424,6 +424,8 @@ $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 ```
 
 # 履歴
+* 1.0.3
+    - CANDY REDに必要な依存関係を追加
 * 1.0.2
     - AMP520の初期設定にかかる所要時間を短縮
 * 1.0.1
