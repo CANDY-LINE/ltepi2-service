@@ -99,7 +99,6 @@ function install_candy_red {
       alert "Unsupported environment"
       exit 1
     fi
-    apt-get upgrade -y
     apt-get remove -y nodered nodejs nodejs-legacy npm
     echo ${MODEL_NAME} | grep -o "ARMv6"
     if [ "$?" == "0" ]; then
