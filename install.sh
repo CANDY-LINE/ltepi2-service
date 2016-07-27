@@ -111,7 +111,7 @@ function install_candy_red {
       apt-get install -y nodejs
     fi
   fi
-  apt-get install -y python-dev python-rpi.gpio bluez
+  apt-get install -y python-dev python-rpi.gpio bluez libudev-dev
   cd ~
   NODE_OPTS=--max-old-space-size=128 npm install -g --unsafe-perm candy-red
   REBOOT=1
