@@ -4,7 +4,7 @@ VENDOR_HOME=/opt/candy-line
 
 SERVICE_NAME=ltepi2
 GITHUB_ID=CANDY-LINE/ltepi2-service
-VERSION=1.0.3
+VERSION=1.0.4
 
 NODEJS_VERSIONS="v0.12 v4.4"
 
@@ -99,7 +99,6 @@ function install_candy_red {
       alert "Unsupported environment"
       exit 1
     fi
-    apt-get upgrade -y
     apt-get remove -y nodered nodejs nodejs-legacy npm
     echo ${MODEL_NAME} | grep -o "ARMv6"
     if [ "$?" == "0" ]; then
