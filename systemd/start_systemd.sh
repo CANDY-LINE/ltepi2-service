@@ -24,6 +24,20 @@ function wait_for_modem_usb_active {
   done
 }
 
+function wait_for_modem_usb_acm_inactive {
+  MAX=40
+  COUNTER=0
+  while [ ${COUNTER} -lt ${MAX} ];
+  do
+    RET=`lsusb | grep 1ecb:0202`
+    if [ "$?" != "0" ]; then
+      break
+    fi
+    sleep 0.5
+    let COUNTER=COUNTER+1
+  done
+}
+
 function wait_for_modem_usb_inactive {
   MAX=40
   COUNTER=0
@@ -101,7 +115,7 @@ function diagnose_self {
 
     look_for_serial_port
     change_usb_data_conn
-    wait_for_modem_usb_inactive
+    wait_for_modem_usb_acm_inactive
     wait_for_modem_usb_active
     if [ -z "${MODEM_USB_MODE}" ]; then
       return
@@ -109,7 +123,6 @@ function diagnose_self {
 
     look_for_serial_port
     enable_auto_connect
-    wait_for_modem_usb_inactive
     wait_for_modem_usb_active
     if [ -z "${MODEM_USB_MODE}" ]; then
       return
