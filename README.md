@@ -21,7 +21,7 @@ ltepi2-serviceは、Raspberry Pi上で動作する[LTEPi for D](http://www.candy
 - [candy-board-amt](https://github.com/CANDY-LINE/candy-board-amt) ... CANDY-LINE基板AM Telecomモデム向け共通モジュール
 
 以下のモジュールは、インストールの可否を選択可能です。 **通常はインストールされます。**
-- [CANDY RED](https://github.com/dbaba/candy-red) ... CANDY EGGクラウドサービスに接続可能なNode-REDベースのフローエディターです。Node.js v0.12またはv4.3が入っていない場合は、Node.js v0.12もインストールされます。すべてのインストールを終えるまでは、有線LAN環境で1~2時間以上かかる場合があります。
+- [CANDY RED](https://github.com/dbaba/candy-red) ... CANDY EGGクラウドサービスに接続可能なNode-REDベースのフローエディターです。Node.js v0.12またはv4.4が入っていない場合は、Node.js v0.12もインストールされます。すべてのインストールを終えるまでは、有線LAN環境で1~2時間以上かかる場合があります。
 
 # 目次
 
