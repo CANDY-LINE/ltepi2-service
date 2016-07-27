@@ -1,4 +1,5 @@
-
+ltepi2-service
+===
 
 [![GitHub release](https://img.shields.io/github/release/CANDY-LINE/ltepi2-service.svg)](https://github.com/CANDY-LINE/ltepi2-service/releases/latest)
 [![License BSD3](https://img.shields.io/github/license/CANDY-LINE/ltepi2-service.svg)](http://opensource.org/licenses/BSD-3-Clause)
@@ -20,7 +21,20 @@ ltepi2-serviceは、Raspberry Pi上で動作する[LTEPi for D](http://www.candy
 - [candy-board-amt](https://github.com/CANDY-LINE/candy-board-amt) ... CANDY-LINE基板AM Telecomモデム向け共通モジュール
 
 以下のモジュールは、インストールの可否を選択可能です。 **通常はインストールされます。**
-- [CANDY RED](https://github.com/dbaba/candy-red) ... CANDY EGGクラウドサービスに接続可能なNode-REDベースのフローエディターです。Node.js v0.12またはv4.3が入っていない場合は、Node.js v0.12もインストールされます。すべてのインストールを終えるまでは、有線LAN環境で1~2時間以上かかる場合があります。
+- [CANDY RED](https://github.com/dbaba/candy-red) ... CANDY EGGクラウドサービスに接続可能なNode-REDベースのフローエディターです。Node.js v0.12またはv4.4が入っていない場合は、Node.js v0.12もインストールされます。すべてのインストールを終えるまでは、有線LAN環境で1~2時間以上かかる場合があります。
+
+# 目次
+
+1. [LTEPi for Dって何？](#ltepi-for-dって何)
+1. [対応ハードウェア](#対応ハードウェア)
+1. [対応OS](#対応OS)
+1. [準備するもの](#準備するもの)
+1. [バージョンアップ方法](#バージョンアップ方法)
+1. [インストール方法](#インストール方法)
+1. [アンインストール方法](#アンインストール方法)
+1. [設定](#設定)
+1. [LTEPi for D基板のGPIOピンマッピング](#ltepi-for-d基板のgpioピンマッピング)
+
 
 # [LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)って何？
 Raspberry Pi B+やRaspberry Pi 2 Model Bに取り付けが可能なLTE通信モジュールを搭載した基板です。NTT DOCOMO及びNTT DOCOMOの回線を利用するMVNOのSIMを利用することができます。
@@ -410,6 +424,8 @@ $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 ```
 
 # 履歴
+* 1.0.2
+    - AMP520の初期設定にかかる所要時間を短縮
 * 1.0.1
     - AMP520において、自動接続モードがデフォルトで有効になるように修正
 * 1.0.0

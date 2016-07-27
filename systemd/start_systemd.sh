@@ -24,6 +24,20 @@ function wait_for_modem_usb_active {
   done
 }
 
+function wait_for_modem_usb_acm_inactive {
+  MAX=40
+  COUNTER=0
+  while [ ${COUNTER} -lt ${MAX} ];
+  do
+    RET=`lsusb | grep 1ecb:0202`
+    if [ "$?" != "0" ]; then
+      break
+    fi
+    sleep 0.5
+    let COUNTER=COUNTER+1
+  done
+}
+
 function wait_for_modem_usb_inactive {
   MAX=40
   COUNTER=0
@@ -71,7 +85,10 @@ function enable_auto_connect {
   logger -t ltepi2 "Enabling auto-connect mode"
   /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init2
   RET=$?
-  if [ "${RET}" != "0" ]; then
+  if [ "${RET}" == "1" ]; then
+    logger -t ltepi2 "** Waiting for USB being inactivated ***"
+    wait_for_modem_usb_inactive
+  elif [ "${RET}" != "0" ]; then
     exit ${RET}
   fi
 }
@@ -90,6 +107,17 @@ function wait_for_default_route {
   done
 }
 
+function register_usbserial {
+  # Registering a new id
+  modprobe usbserial vendor=0x1ecb product=0x0208
+  RET=$?
+  if [ "${RET}" != "0" ]; then
+    if [ -e "/sys/bus/usb-serial/drivers/pl2303" ]; then
+      echo "1ecb 0208" > /sys/bus/usb-serial/drivers/pl2303/new_id
+    fi
+  fi
+}
+
 function diagnose_self {
   wait_for_modem_usb_active
   if [ -z "${MODEM_USB_MODE}" ]; then
@@ -101,15 +129,15 @@ function diagnose_self {
 
     look_for_serial_port
     change_usb_data_conn
-    wait_for_modem_usb_inactive
+    wait_for_modem_usb_acm_inactive
     wait_for_modem_usb_active
     if [ -z "${MODEM_USB_MODE}" ]; then
       return
     fi
 
+    register_usbserial
     look_for_serial_port
     enable_auto_connect
-    wait_for_modem_usb_inactive
     wait_for_modem_usb_active
     if [ -z "${MODEM_USB_MODE}" ]; then
       return
@@ -133,14 +161,7 @@ function activate_lte {
   if [ -n "${IF_NAME}" ]; then
     ifconfig ${IF_NAME} up
     logger -t ltepi2 "The interface [${IF_NAME}] is up!"
-    # Registering a new id
-    modprobe usbserial vendor=0x1ecb product=0x0208
-    RET=$?
-    if [ "${RET}" != "0" ]; then
-      if [ -e "/sys/bus/usb-serial/drivers/pl2303" ]; then
-        echo "1ecb 0208" > /sys/bus/usb-serial/drivers/pl2303/new_id
-      fi
-    fi
+    register_usbserial
     look_for_serial_port
     wait_for_default_route
 
