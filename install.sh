@@ -16,6 +16,7 @@ CONTAINER_MODE=0
 if [ "${KERNEL}" != "$(uname -r)" ]; then
   CONTAINER_MODE=1
 fi
+WELCOME_FLOW_URL=https://git.io/vKpEF
 
 REBOOT=0
 
@@ -112,7 +113,7 @@ function install_candy_red {
   fi
   apt-get install -y python-dev python-rpi.gpio bluez libudev-dev
   cd ~
-  NODE_OPTS=--max-old-space-size=128 npm install -g --unsafe-perm candy-red
+  WELCOME_FLOW_URL=${WELCOME_FLOW_URL} NODE_OPTS=--max-old-space-size=128 npm install -g --unsafe-perm candy-red
   REBOOT=1
 }
 
