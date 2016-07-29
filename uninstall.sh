@@ -55,7 +55,7 @@ function teardown {
   [ "$(ls -A ${SERVICE_HOME})" ] || rmdir ${SERVICE_HOME}
   [ "$(ls -A ${VENDOR_HOME})" ] || rmdir ${VENDOR_HOME}
   if [ "${REBOOT}" == "1" ]; then
-    alert "*** Please reboot the system! (enter 'reboot') ***"
+    alert "*** Please reboot the system! (enter 'sudo reboot') ***"
   fi
 }
 

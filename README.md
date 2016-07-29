@@ -250,7 +250,7 @@ Uninstalling candy-board-amt:
   Successfully uninstalled candy-board-amt
 Uninstalling candy-board-cli:
   Successfully uninstalled candy-board-cli
-[ALERT] *** Please reboot the system! (enter 'reboot') ***
+[ALERT] *** Please reboot the system! (enter 'sudo reboot') ***
 ```
 
 ## CANDY REDのアンインストール
