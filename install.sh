@@ -16,7 +16,7 @@ CONTAINER_MODE=0
 if [ "${KERNEL}" != "$(uname -r)" ]; then
   CONTAINER_MODE=1
 fi
-WELCOME_FLOW_URL=https://git.io/vKpEF
+WELCOME_FLOW_URL=https://git.io/vKhk3
 
 REBOOT=0
 
