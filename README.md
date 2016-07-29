@@ -432,6 +432,8 @@ $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 ```
 
 # 履歴
+* 1.0.5
+    - CANDY REDをインストールする際のデフォルトフローを指定
 * 1.0.4
     - `apt-get upgrade`を常に強制せず利用者のタイミングで実行できるように変更
 * 1.0.3
