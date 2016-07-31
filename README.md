@@ -437,6 +437,8 @@ $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 ```
 
 # 履歴
+* 1.1.0
+    - CANDY REDのデフォルトフローを追加
 * 1.0.5
     - CANDY REDをインストールする際のデフォルトフローを指定
 * 1.0.4
