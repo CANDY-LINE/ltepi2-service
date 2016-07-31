@@ -113,6 +113,7 @@ function install_candy_red {
   fi
   apt-get install -y python-dev python-rpi.gpio bluez libudev-dev
   cd ~
+  npm cache clean
   WELCOME_FLOW_URL=${WELCOME_FLOW_URL} NODE_OPTS=--max-old-space-size=128 npm install -g --unsafe-perm candy-red
   REBOOT=1
 }
