@@ -376,6 +376,11 @@ http://raspberrypi.local:8100
 ```
 もしRaspberry Piのホスト名を変更していた場合は、「ホスト名.local」を「raspberrypi.local」の代わりに指定します。名前で繋がらないときは、IPアドレスを指定しましょう。
 
+接続に成功すると、以下のようなページが表示されます（通信環境が悪い場合は英語版の表示が出ることがありますが表記以外は同一のものです）。
+![CANDY RED Screenshot on LTEPi for D](https://raw.githubusercontent.com/CANDY-LINE/ltepi2-service/master/images/screenshot-welcome-flow.jpg "CANDY RED Screenshot on LTEPi for D")
+
+このフローはあくまで参考のためのものです。これを削除してご自身のフローを作成することができます。
+
 ## 対SDカード破損方法
 ltepi2サービスや[CANDY RED](https://github.com/dbaba/candy-red)を動作させる場合は、通常スワップが発生することはありません。
 しかし、Raspberry Piを使っていくうちに、気がつくとより多くのメモリーを使うプログラムを長期に渡って実行させてしまっていることもあるかもしれません。
