@@ -4,7 +4,7 @@ ltepi2-service
 [![GitHub release](https://img.shields.io/github/release/CANDY-LINE/ltepi2-service.svg)](https://github.com/CANDY-LINE/ltepi2-service/releases/latest)
 [![License BSD3](https://img.shields.io/github/license/CANDY-LINE/ltepi2-service.svg)](http://opensource.org/licenses/BSD-3-Clause)
 
-ltepi2-serviceは、Raspberry Pi上で動作する[LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)を動作させるためのシステムサービス（Raspberry Pi上で自動的に動作するソフトウェア）です。
+ltepi2-serviceは、Raspberry Pi上で動作する[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)を動作させるためのシステムサービス（Raspberry Pi上で自動的に動作するソフトウェア）です。
 
 本サービスでは、以下の機能を提供しています。
 
@@ -36,7 +36,7 @@ ltepi2-serviceは、Raspberry Pi上で動作する[LTEPi for D](http://www.candy
 1. [LTEPi for D基板のGPIOピンマッピング](#ltepi-for-d基板のgpioピンマッピング)
 
 
-# [LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)って何？
+# [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)って何？
 Raspberry Pi B+やRaspberry Pi 2 Model Bに取り付けが可能なLTE通信モジュールを搭載した基板です。NTT DOCOMO及びNTT DOCOMOの回線を利用するMVNOのSIMを利用することができます。
 
 Raspberry Pi 3にも取り付けることは可能ですが、条件に見合ったACアダプターが必要となります。また、ACアダプターのためのジャックも取り付けていただく必要があります。というのも電源の接続を誤りますとRaspberry Piや基板を壊してしまいますので、出荷時の状態ではRaspberry Pi 3に接続できないように設計されています。
@@ -46,7 +46,7 @@ Raspberry Pi 3にも取り付けることは可能ですが、条件に見合っ
 1. Raspberry Pi2 Model B
 1. ＜下記条件付対応＞ Raspberry Pi3
     * Raspberry Pi3につきましては消費電力が高いため、**5V/24WレベルのACアダプターと、ご利用者によるACジャックの半田付けが必要** となります
-    * [LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)の基板上にACジャックを取り付けてACアダプターから電力を供給した場合、**Raspberry Pi3へも電力が供給** されます。また、その場合 **Raspberry Pi3にある給電用USBを利用しない** ようにご注意ください。[LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)やRaspberry Pi3が故障します
+    * [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)の基板上にACジャックを取り付けてACアダプターから電力を供給した場合、**Raspberry Pi3へも電力が供給** されます。また、その場合 **Raspberry Pi3にある給電用USBを利用しない** ようにご注意ください。[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)やRaspberry Pi3が故障します
 
 # 対応OS
 Raspbian 4.4以降
@@ -56,10 +56,10 @@ Raspbian 4.4以降
 
 1. Raspberry Pi本体
 1. Raspbianインストール済みのマイクロSDカード
-1. [LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)本体（あらかじめRaspberry Piに取り付けておいて下さい）
-1. [LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)付属のアンテナケーブルとアンテナ本体
+1. [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)本体（あらかじめRaspberry Piに取り付けておいて下さい）
+1. [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)付属のアンテナケーブルとアンテナ本体
 1. SIMカード（回線契約が有効であるもの）
-1. [LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)付属のUSBケーブル
+1. [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)付属のUSBケーブル
 1. Raspberry Pi電源供給用USBケーブル
 1. LANケーブル
 1. インターネット・ブロードバンドルーター
@@ -72,9 +72,9 @@ Raspbian 4.4以降
 
 すでにRaspberry PiにてWi-Fiの設定を行い利用できている場合は、Wi-Fi経由で作業を行うことも可能です。
 
-次に、[LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)をRaspberry Piに設置します。また、付属のアンテナを2本ともモジュールに接続します。続けて、SIMカードを差し込みます。SIMカードは、金属面を下向きにして取り付けます。
+次に、[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)をRaspberry Piに設置します。また、付属のアンテナを2本ともモジュールに接続します。続けて、SIMカードを差し込みます。SIMカードは、金属面を下向きにして取り付けます。
 
-最後に、付属のUSBケーブルで[LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)とRaspberry Piを接続します。
+最後に、付属のUSBケーブルで[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)とRaspberry Piを接続します。
 
 これで準備が整いました。それでは、Raspberry Piの電源用USBケーブルを接続してRaspberry Piを起動させましょう。
 
@@ -147,7 +147,7 @@ $ VERSION=1.2.3 && \
 $ sudo reboot
 ```
 
-再起動後しばらくすると、[LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)のLEDにある2つのLEDのうち1つがオレンジ色で常時点灯となり、もう一つが点滅します。これはLTEモジュールが起動していることを表しています。
+再起動後しばらくすると、[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)のLEDにある2つのLEDのうち1つがオレンジ色で常時点灯となり、もう一つが点滅します。これはLTEモジュールが起動していることを表しています。
 
 もし圏外だったり、アンテナが接続されていなかったりした場合は、LTEモジュールは起動できません。LEDの表示はオレンジ色の1つのみ点灯します。
 以下にLTEモジュールが起動しない場合のトラブルシューティングをまとめていますので、ご確認ください。
@@ -201,11 +201,11 @@ APN設定方法には、他にファイルを使用した方法もあります�
 LTEモジュールが動作するためにはいくつか条件が必要となります。Raspberry Piが動作するだけでは十分ではありませんので、うまくいかないときは以下の項目を確認して試してみてください。
 
 1. ltepi2-serviceのインストールは完了していますか？ もしかすると、ltepi2-serviceをインストールしていない別のSDカードを使用しているかもしれません。ltepi2-serviceがインストールされていない場合、LTEモジュールは自動的に起動することはありません。`systemctl status ltepi2`を実施し、`(/lib/systemd/system/ltepi2.service; enabled)`と表示されていることを確認しましょう。
-1. [LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)とRaspberry Piは、付属のUSBケーブルで正しく接続されていますか？ Raspberry Pi本体の電源用USBアダプターとと[LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)のUSB通信用アダプターは近い位置にありますから、間違えないようにしましょう。
+1. [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)とRaspberry Piは、付属のUSBケーブルで正しく接続されていますか？ Raspberry Pi本体の電源用USBアダプターとと[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)のUSB通信用アダプターは近い位置にありますから、間違えないようにしましょう。
 1. NTT DOCOMOの電波の圏内ですか？ [こちら](https://www.nttdocomo.co.jp/support/area/)のサイトからFOMA/LTEのサービスエリアを確認し、サービスエリア圏内であることを確認しましょう。また、FOMA/LTE対応の携帯電話をお持ちであれば、FOMA/LTEの電波が圏内であることを確認してみましょう。
-1. [LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)にアンテナは正しく接続されていますか？ LTEモジュールは、電源が十分供給されていてもアンテナが接続されていないと起動することができません。LTEモジュールに接続するアンテナケーブルとアンテナ本体が、外れることなく取り付けられていることを確認しましょう。
-1. Raspberry Piに供給する機器側からは十分な電力が供給できていますか？ [LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)が動作するためには、Raspberry Piに加えてより多くの電力が必要になります。もしかするとUSBバスパワーを供給する機器側のUSBポートは、電力が十分ではないかもしれません。もしうまく動作しない場合は、別のUSBポートにつなぎ変えたり、別のUSB電源用意したりしてお試しください。
-1. Raspberry Piに電源供給するために使用しているUSBケーブルは正しく動作していますか？ USBケーブルの商品の種類や使用状態によっては、[LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)が動作するために必要な電力をRaspberry Piに伝えられていない可能性もあります。他のUSBケーブルもお試しください。
+1. [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)にアンテナは正しく接続されていますか？ LTEモジュールは、電源が十分供給されていてもアンテナが接続されていないと起動することができません。LTEモジュールに接続するアンテナケーブルとアンテナ本体が、外れることなく取り付けられていることを確認しましょう。
+1. Raspberry Piに供給する機器側からは十分な電力が供給できていますか？ [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)が動作するためには、Raspberry Piに加えてより多くの電力が必要になります。もしかするとUSBバスパワーを供給する機器側のUSBポートは、電力が十分ではないかもしれません。もしうまく動作しない場合は、別のUSBポートにつなぎ変えたり、別のUSB電源用意したりしてお試しください。
+1. Raspberry Piに電源供給するために使用しているUSBケーブルは正しく動作していますか？ USBケーブルの商品の種類や使用状態によっては、[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)が動作するために必要な電力をRaspberry Piに伝えられていない可能性もあります。他のUSBケーブルもお試しください。
 
 ### ltepi2-serviceの起動と停止
 
@@ -263,7 +263,7 @@ $ sudo npm uninstall -g --unsafe-perm candy-red
 
 ## LED点滅のON/OFF
 
-既定の設定では、モデムが動作している間は[LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)のLEDが点滅します。また、その時間間隔は0.4秒となっています。
+既定の設定では、モデムが動作している間は[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)のLEDが点滅します。また、その時間間隔は0.4秒となっています。
 
 これらの設定は、インストール後に`/opt/candy-line/ltepi2/environment`にある以下の箇所に定義されています。
 
@@ -376,6 +376,11 @@ http://raspberrypi.local:8100
 ```
 もしRaspberry Piのホスト名を変更していた場合は、「ホスト名.local」を「raspberrypi.local」の代わりに指定します。名前で繋がらないときは、IPアドレスを指定しましょう。
 
+接続に成功すると、以下のようなページが表示されます（通信環境が悪い場合は英語版の表示が出ることがありますが表記以外は同一のものです）。
+![CANDY RED Screenshot on LTEPi for D](https://raw.githubusercontent.com/CANDY-LINE/ltepi2-service/master/images/screenshot-welcome-flow.jpg "CANDY RED Screenshot on LTEPi for D")
+
+このフローはあくまで参考のためのものです。これを削除してご自身のフローを作成することができます。
+
 ## 対SDカード破損方法
 ltepi2サービスや[CANDY RED](https://github.com/dbaba/candy-red)を動作させる場合は、通常スワップが発生することはありません。
 しかし、Raspberry Piを使っていくうちに、気がつくとより多くのメモリーを使うプログラムを長期に渡って実行させてしまっていることもあるかもしれません。
@@ -389,7 +394,7 @@ ltepi2サービスや[CANDY RED](https://github.com/dbaba/candy-red)を動作さ
 また、上記のほか、Web検索にて種々の方法が紹介されていますので、目的や用途に合った方法をお試しください。
 なお、これらの紹介はあくまで情報提供であり、私たちの保証する方法ではありませんのでご注意ください。
 
-# [LTEPi for D](http://www.candy-line.io/test/proandsv.html#ltepiford)基板のGPIOピンマッピング
+# [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)基板のGPIOピンマッピング
 
 | RPi B+/2 GPIO  | AMP520/AMM570 |
 | -------------- | ------------- |
@@ -432,6 +437,8 @@ $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 ```
 
 # 履歴
+* 1.1.0
+    - CANDY REDのデフォルトフローを追加
 * 1.0.5
     - CANDY REDをインストールする際のデフォルトフローを指定
 * 1.0.4

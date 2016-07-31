@@ -4,7 +4,7 @@ VENDOR_HOME=/opt/candy-line
 
 SERVICE_NAME=ltepi2
 GITHUB_ID=CANDY-LINE/ltepi2-service
-VERSION=1.0.5
+VERSION=1.1.0
 
 NODEJS_VERSIONS="v0.12 v4.4"
 
@@ -16,7 +16,7 @@ CONTAINER_MODE=0
 if [ "${KERNEL}" != "$(uname -r)" ]; then
   CONTAINER_MODE=1
 fi
-WELCOME_FLOW_URL=https://git.io/vKpEF
+WELCOME_FLOW_URL=https://git.io/vKhk3
 
 REBOOT=0
 
@@ -113,6 +113,7 @@ function install_candy_red {
   fi
   apt-get install -y python-dev python-rpi.gpio bluez libudev-dev
   cd ~
+  npm cache clean
   WELCOME_FLOW_URL=${WELCOME_FLOW_URL} NODE_OPTS=--max-old-space-size=128 npm install -g --unsafe-perm candy-red
   REBOOT=1
 }
