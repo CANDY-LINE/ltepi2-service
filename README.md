@@ -45,8 +45,8 @@ Raspberry Pi 3にも取り付けることは可能ですが、条件に見合っ
 1. Raspberry Pi B+
 1. Raspberry Pi2 Model B
 1. ＜下記条件付対応＞ Raspberry Pi3
-    * Raspberry Pi3につきましては消費電力が高いため、**5V/24WレベルのACアダプターと、ご利用者によるACジャックの半田付けが必要** となります
-    * [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)の基板上にACジャックを取り付けてACアダプターから電力を供給した場合、**Raspberry Pi3へも電力が供給** されます。また、その場合 **Raspberry Pi3にある給電用USBを利用しない** ようにご注意ください。[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)やRaspberry Pi3が故障します
+    * Raspberry Pi3につきましては消費電力が高いため、**5V/24WレベルのACアダプターと、ご利用者によるDCジャックの半田付けが必要** となります
+    * [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)の基板上にDCジャックを取り付けてACアダプターから電力を供給した場合、**Raspberry Pi3へも電力が供給** されます。また、その場合 **Raspberry Pi3にある給電用USBを利用しない** ようにご注意ください。[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)やRaspberry Pi3が故障します
 
 # 対応OS
 Raspbian 4.4以降
