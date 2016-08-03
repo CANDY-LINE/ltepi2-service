@@ -394,17 +394,6 @@ ltepi2サービスや[CANDY RED](https://github.com/dbaba/candy-red)を動作さ
 また、上記のほか、Web検索にて種々の方法が紹介されていますので、目的や用途に合った方法をお試しください。
 なお、これらの紹介はあくまで情報提供であり、私たちの保証する方法ではありませんのでご注意ください。
 
-# [LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)基板のGPIOピンマッピング
-
-| RPi B+/2 GPIO  | AMP520/AMM570 |
-| -------------- | ------------- |
-|    20 (OUT)    |     POWER     |
-|    21 (OUT)    |     RESET     |
-|     6 (OUT)    |    RESERVED   |
-|    14 (IN)     |      TX       |
-|    15 (OUT)    |      RX       |
-|    16 (IN)     |      RI       |
-
 # 管理者向け
 ## モジュールリリース時の注意
 1. [`install.sh`](install.sh)内の`VERSION=`にあるバージョンを修正してコミットする
