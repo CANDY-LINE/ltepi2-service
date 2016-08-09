@@ -6,7 +6,7 @@ ltepi2-service
 
 ltepi2-serviceは、Raspberry Pi上で動作する[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)を動作させるためのシステムサービス（Raspberry Pi上で自動的に動作するソフトウェア）です。
 
-ltepi2-serviceや、[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)に関する説明については、専用の[Wikiページ](https://github.com/CANDY-LINE/ltepi2-service/wiki)をご覧ください。
+ltepi2-serviceや、[LTEPi for D](http://www.candy-line.io/proandsv.html#ltepiford)に関する説明については、専用の[利用ガイド](https://github.com/CANDY-LINE/LTEPi2-info/blob/master/README.md)をご覧ください。
 
 # 管理者向け
 ## モジュールリリース時の注意
