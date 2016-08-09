@@ -72,6 +72,8 @@ function install_scripts {
 }
 
 function install_candy_board {
+  apt-get update -qq
+  apt-get install -qq python-pip
   pip install --upgrade candy-board-cli
   pip install --upgrade candy-board-amt
 }
