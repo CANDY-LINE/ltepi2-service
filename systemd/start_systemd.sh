@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 PRODUCT="LTEPi-II Board"
+PRODUCT_DIR_NAME="ltepi2"
 MODEM_USB_MODE=""
 MODEM_SERIAL_PORT=""
 
@@ -71,22 +72,22 @@ function look_for_serial_port {
 }
 
 function change_usb_data_conn {
-  logger -t ltepi2 "Modifying the USB data connection I/F to ECM"
-  /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init1
+  logger -t ${PRODUCT_DIR_NAME} "Modifying the USB data connection I/F to ECM"
+  /usr/bin/env python /opt/candy-line/${PRODUCT_DIR_NAME}/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init1
   RET=$?
   if [ "${RET}" == "0" ]; then
-    logger -t ltepi2 "*** Restarting modem... ***"
+    logger -t ${PRODUCT_DIR_NAME} "*** Restarting modem... ***"
   else
     exit ${RET}
   fi
 }
 
 function enable_auto_connect {
-  logger -t ltepi2 "Enabling auto-connect mode"
-  /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init2
+  logger -t ${PRODUCT_DIR_NAME} "Enabling auto-connect mode"
+  /usr/bin/env python /opt/candy-line/${PRODUCT_DIR_NAME}/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init2
   RET=$?
   if [ "${RET}" == "1" ]; then
-    logger -t ltepi2 "** Waiting for USB being inactivated ***"
+    logger -t ${PRODUCT_DIR_NAME} "** Waiting for USB being inactivated ***"
     wait_for_modem_usb_inactive
   elif [ "${RET}" != "0" ]; then
     exit ${RET}
@@ -151,7 +152,7 @@ function activate_lte {
     return
   fi
 
-  logger -t ltepi2 "Activating LTE/3G Module..."
+  logger -t ${PRODUCT_DIR_NAME} "Activating LTE/3G Module..."
   USB_ID=`dmesg | grep "New USB device found, idVendor=1ecb, idProduct=0208" | sed 's/^.*\] //g' | cut -f 1 -d ':' | cut -f 2 -d ' ' | tail -1`
   # when renamed
   IF_NAME=`dmesg | grep "renamed network interface usb1" | sed 's/^.* usb1 to //g' | cut -f 1 -d ' ' | tail -1`
@@ -160,7 +161,7 @@ function activate_lte {
   fi
   if [ -n "${IF_NAME}" ]; then
     ifconfig ${IF_NAME} up
-    logger -t ltepi2 "The interface [${IF_NAME}] is up!"
+    logger -t ${PRODUCT_DIR_NAME} "The interface [${IF_NAME}] is up!"
     register_usbserial
     look_for_serial_port
     wait_for_default_route
@@ -171,16 +172,16 @@ function activate_lte {
 }
 
 # start banner
-logger -t ltepi2 "Initializing ${PRODUCT}..."
+logger -t ${PRODUCT_DIR_NAME} "Initializing ${PRODUCT}..."
 
-/opt/candy-line/ltepi2/_modem_on.sh > /dev/null 2>&1
+/opt/candy-line/${PRODUCT_DIR_NAME}/_modem_on.sh > /dev/null 2>&1
 diagnose_self
 activate_lte
 
 # end banner
 if [ "${MODEM_USB_MODE}" == "ECM" ]; then
-  logger -t ltepi2 "${PRODUCT} is initialized successfully!"
-  /usr/bin/env python /opt/candy-line/ltepi2/server_main.py ${MODEM_SERIAL_PORT} ${IF_NAME}
+  logger -t ${PRODUCT_DIR_NAME} "${PRODUCT} is initialized successfully!"
+  /usr/bin/env python /opt/candy-line/${PRODUCT_DIR_NAME}/server_main.py ${MODEM_SERIAL_PORT} ${IF_NAME}
 else
-  logger -t ltepi2 "${PRODUCT} is not initialized... Silently terminated"
+  logger -t ${PRODUCT_DIR_NAME} "${PRODUCT} is not initialized... Silently terminated"
 fi
