@@ -19,19 +19,22 @@ import logging
 import logging.handlers
 
 # sys.argv[0] ... Serial Port
-# sys.argv[1] ... The path to socket file, e.g. /var/run/candy-board-service.sock
+# sys.argv[1] ... The path to socket file,
+#                 e.g. /var/run/candy-board-service.sock
 # sys.argv[2] ... The network interface name to be monitored
 
 logger = logging.getLogger('ltepi2')
 logger.setLevel(logging.INFO)
-handler = logging.handlers.SysLogHandler(address = '/dev/log')
+handler = logging.handlers.SysLogHandler(address='/dev/log')
 logger.addHandler(handler)
 formatter = logging.Formatter('%(module)s.%(funcName)s: %(message)s')
 handler.setFormatter(formatter)
 led = 0
-led_sec = float(os.environ['BLINKY_INTERVAL_SEC']) if 'BLINKY_INTERVAL_SEC' in os.environ else 1.0
+led_sec = float(os.environ['BLINKY_INTERVAL_SEC']) \
+    if 'BLINKY_INTERVAL_SEC' in os.environ else 1.0
 if led_sec < 0 or led_sec > 60:
     led_sec = 1.0
+
 
 class Monitor(threading.Thread):
     FNULL = open(os.devnull, 'w')
@@ -42,22 +45,36 @@ class Monitor(threading.Thread):
 
     def run(self):
         while True:
-            err = subprocess.call("ip route | grep %s" % self.nic, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
+            err = subprocess.call("ip route | grep %s" % self.nic,
+                                  shell=True,
+                                  stdout=Monitor.FNULL,
+                                  stderr=subprocess.STDOUT)
             if err != 0:
                 logger.error("LTEPi-II modem is terminated. Shutting down.")
-                os.kill(os.getpid(), signal.SIGTERM) # exit from non-main thread
+                # exit from non-main thread
+                os.kill(os.getpid(), signal.SIGTERM)
                 break
-            err = subprocess.call("ip route | grep default | grep -v %s" % self.nic, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
+            err = subprocess.call("ip route | grep default | grep -v %s" %
+                                  self.nic, shell=True, stdout=Monitor.FNULL,
+                                  stderr=subprocess.STDOUT)
             if err == 0:
-                ls_nic_cmd = "ip route | grep default | grep -v %s | tr -s ' ' | cut -d ' ' -f 5" % self.nic
-                ls_nic = subprocess.Popen(ls_nic_cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
+                ls_nic_cmd = "ip route | grep default | grep -v %s " + \
+                             "| tr -s ' ' | cut -d ' ' -f 5" % self.nic
+                ls_nic = subprocess.Popen(ls_nic_cmd,
+                                          shell=True,
+                                          stdout=subprocess.PIPE).stdout.read()
                 logger.debug("modem_init() : ls_nic => %s" % ls_nic)
                 for nic in ls_nic.split("\n"):
                     if nic:
-                        ip_cmd = "ip route | grep %s | awk '/default/ { print $3 }'" % nic
-                        ip = subprocess.Popen(ip_cmd, shell=True, stdout=subprocess.PIPE).stdout.read()
-                        subprocess.call("ip route del default via %s" % ip, shell=True)
+                        ip_cmd = "ip route | grep %s " _ \
+                                 "| awk '/default/ { print $3 }'" % nic
+                        ip = subprocess.Popen(ip_cmd, shell=True,
+                                              stdout=subprocess.PIPE
+                                              ).stdout.read()
+                        subprocess.call("ip route del default via %s" % ip,
+                                        shell=True)
             time.sleep(5)
+
 
 def delete_sock_path(sock_path):
     # remove sock_path
@@ -67,10 +84,12 @@ def delete_sock_path(sock_path):
         if os.path.exists(sock_path):
             raise
 
+
 def resolve_version():
     if 'VERSION' in os.environ:
         return os.environ['VERSION']
     return 'N/A'
+
 
 def resolve_boot_apn():
     dir = os.path.dirname(os.path.abspath(__file__))
@@ -82,23 +101,30 @@ def resolve_boot_apn():
     os.remove(apn_json)
     return apn
 
+
 def modem_init1(serial_port, sock_path):
     delete_sock_path(sock_path)
     atexit.register(delete_sock_path, sock_path)
 
     serial = candy_board_amt.SerialPort(serial_port, 115200)
-    server = candy_board_amt.SockServer(resolve_version(), resolve_boot_apn(), sock_path, serial)
-    ret = server.perform({'category':'modem', 'action':'enable_ecm'})
+    server = candy_board_amt.SockServer(resolve_version(),
+                                        resolve_boot_apn(),
+                                        sock_path, serial)
+    ret = server.perform({'category': 'modem', 'action': 'enable_ecm'})
     logger.debug("modem_init1() : modem, enable_ecm => %s" % ret)
     sys.exit(json.loads(ret)['status'] != 'OK')
+
 
 def modem_init2(serial_port, sock_path):
     delete_sock_path(sock_path)
     atexit.register(delete_sock_path, sock_path)
 
     serial = candy_board_amt.SerialPort(serial_port, 115200)
-    server = candy_board_amt.SockServer(resolve_version(), resolve_boot_apn(), sock_path, serial)
-    ret = server.perform({'category':'modem', 'action':'enable_auto_connect'})
+    server = candy_board_amt.SockServer(resolve_version(),
+                                        resolve_boot_apn(),
+                                        sock_path, serial)
+    ret = server.perform({'category': 'modem',
+                          'action': 'enable_auto_connect'})
     logger.debug("modem_init2() : modem, enable_auto_connect => %s" % ret)
     ret = json.loads(ret)
     if ret['status'] == 'OK':
@@ -108,13 +134,18 @@ def modem_init2(serial_port, sock_path):
             sys.exit(1)
     sys.exit(2)
 
+
 def blinky():
     global led, led_sec
     led = 0 if led != 0 else 1
-    subprocess.call("echo %d > /sys/class/gpio/gpio4/value" % led, shell=True, stdout=Monitor.FNULL, stderr=subprocess.STDOUT)
+    subprocess.call("echo %d > /sys/class/gpio/gpio4/value" % led,
+                    shell=True, stdout=Monitor.FNULL,
+                    stderr=subprocess.STDOUT)
     threading.Timer(led_sec, blinky, ()).start()
 
-def server_main(serial_port, nic, sock_path='/var/run/candy-board-service.sock'):
+
+def server_main(serial_port, nic,
+                sock_path='/var/run/candy-board-service.sock'):
     delete_sock_path(sock_path)
     atexit.register(delete_sock_path, sock_path)
 
@@ -125,7 +156,9 @@ def server_main(serial_port, nic, sock_path='/var/run/candy-board-service.sock')
     logger.debug("server_main() : Setting up SerialPort...")
     serial = candy_board_amt.SerialPort(serial_port, 115200)
     logger.debug("server_main() : Setting up SockServer...")
-    server = candy_board_amt.SockServer(resolve_version(), resolve_boot_apn(), sock_path, serial)
+    server = candy_board_amt.SockServer(resolve_version(),
+                                        resolve_boot_apn(),
+                                        sock_path, serial)
     if 'DEBUG' in os.environ and os.environ['DEBUG'] == "1":
         server.debug = True
 
@@ -142,7 +175,8 @@ def server_main(serial_port, nic, sock_path='/var/run/candy-board-service.sock')
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
-        logger.error("USB Ethernet Network Interface isn't ready. Shutting down.")
+        logger.error("USB Ethernet Network Interface isn't ready. " +
+                     "Shutting down.")
     elif len(sys.argv) > 3:
         if sys.argv[3] == 'init1':
             modem_init1(sys.argv[1], sys.argv[2])
