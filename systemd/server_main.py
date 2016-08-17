@@ -66,7 +66,7 @@ class Monitor(threading.Thread):
                 logger.debug("modem_init() : ls_nic => %s" % ls_nic)
                 for nic in ls_nic.split("\n"):
                     if nic:
-                        ip_cmd = "ip route | grep %s " _ \
+                        ip_cmd = "ip route | grep %s " + \
                                  "| awk '/default/ { print $3 }'" % nic
                         ip = subprocess.Popen(ip_cmd, shell=True,
                                               stdout=subprocess.PIPE
