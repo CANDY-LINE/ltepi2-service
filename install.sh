@@ -4,7 +4,7 @@ VENDOR_HOME=/opt/candy-line
 
 SERVICE_NAME=ltepi2
 GITHUB_ID=CANDY-LINE/ltepi2-service
-VERSION=1.1.1
+VERSION=1.2.0
 
 NODEJS_VERSIONS="v0.12 v4.4"
 

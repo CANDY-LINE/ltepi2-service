@@ -41,6 +41,8 @@ $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 ```
 
 # 履歴
+* 1.2.0
+    - モデムによるインターネット接続時にのみLEDが点滅するように変更
 * 1.1.1
     - pipのインストールを追加
 * 1.1.0
