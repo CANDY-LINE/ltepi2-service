@@ -58,16 +58,16 @@ class Monitor(threading.Thread):
                                   self.nic, shell=True, stdout=Monitor.FNULL,
                                   stderr=subprocess.STDOUT)
             if err == 0:
-                ls_nic_cmd = "ip route | grep default | grep -v %s " + \
-                             "| tr -s ' ' | cut -d ' ' -f 5" % self.nic
+                ls_nic_cmd = ("ip route | grep default | grep -v %s " +
+                              "| tr -s ' ' | cut -d ' ' -f 5") % self.nic
                 ls_nic = subprocess.Popen(ls_nic_cmd,
                                           shell=True,
                                           stdout=subprocess.PIPE).stdout.read()
                 logger.debug("modem_init() : ls_nic => %s" % ls_nic)
                 for nic in ls_nic.split("\n"):
                     if nic:
-                        ip_cmd = "ip route | grep %s " + \
-                                 "| awk '/default/ { print $3 }'" % nic
+                        ip_cmd = ("ip route | grep %s " +
+                                  "| awk '/default/ { print $3 }'") % nic
                         ip = subprocess.Popen(ip_cmd, shell=True,
                                               stdout=subprocess.PIPE
                                               ).stdout.read()
