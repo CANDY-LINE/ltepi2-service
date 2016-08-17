@@ -1,16 +1,17 @@
 #!/usr/bin/env bash
 
 PRODUCT="LTEPi-II Board"
+PRODUCT_DIR_NAME="ltepi2"
 MODULE_SUPPORTED=0
 
 function led_off {
-  . /opt/candy-line/ltepi2/_pin_settings.sh > /dev/null 2>&1
+  . /opt/candy-line/${PRODUCT_DIR_NAME}/_pin_settings.sh > /dev/null 2>&1
   echo 0 > ${LED2_PIN}/value
 }
 
 function wait_for_modem_usb_inactive {
   if [ "${FAST_SHUTDOWN}" == "1" ]; then
-    logger -t ltepi2 "[FAST_SHUTDOWN] Skipping to monitor USB status..."
+    logger -t ${PRODUCT_DIR_NAME} "[FAST_SHUTDOWN] Skipping to monitor USB status..."
     return
   fi
   MAX=30
@@ -49,7 +50,7 @@ function inactivate_lte {
     return
   fi
 
-  logger -t ltepi2 "Inactivating LTE/3G Module..."
+  logger -t ${PRODUCT_DIR_NAME} "Inactivating LTE/3G Module..."
   USB_ID=`dmesg | grep "New USB device found, idVendor=1ecb, idProduct=0208" | sed 's/^.*\] //g' | cut -f 1 -d ':' | cut -f 2 -d ' ' | tail -1`
   IF_NAME=`dmesg | grep " ${USB_ID}" | grep "register 'cdc_ether'" | cut -f 2 -d ':' | cut -f 2 -d ' ' | tail -1`
   if [ -z "${IF_NAME}" ]; then
@@ -58,7 +59,7 @@ function inactivate_lte {
   fi
   if [ -n "${IF_NAME}" ]; then
     ifconfig ${IF_NAME} down
-    logger -t ltepi2 "The interface [${IF_NAME}] is down!"
+    logger -t ${PRODUCT_DIR_NAME} "The interface [${IF_NAME}] is down!"
 
     RET=`ifconfig | grep wlan0`
     RET=$?
@@ -70,14 +71,14 @@ function inactivate_lte {
 }
 
 # start banner
-logger -t ltepi2 "Inactivating ${PRODUCT}..."
+logger -t ${PRODUCT_DIR_NAME} "Inactivating ${PRODUCT}..."
 
 diagnose_self
 inactivate_lte
-/opt/candy-line/ltepi2/_modem_off.sh > /dev/null 2>&1
+/opt/candy-line/${PRODUCT_DIR_NAME}/_modem_off.sh > /dev/null 2>&1
 led_off
 wait_for_modem_usb_inactive
 led_off # ensure LED off
 
 # end banner
-logger -t ltepi2 "${PRODUCT} is inactivated successfully!"
+logger -t ${PRODUCT_DIR_NAME} "${PRODUCT} is inactivated successfully!"
