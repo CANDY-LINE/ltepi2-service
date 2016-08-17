@@ -74,7 +74,7 @@ class Monitor(threading.Thread):
                 ls_nic = subprocess.Popen(ls_nic_cmd,
                                           shell=True,
                                           stdout=subprocess.PIPE).stdout.read()
-                logger.debug("modem_init() : ls_nic => %s" % ls_nic)
+                logger.debug("ls_nic => %s" % ls_nic)
                 for nic in ls_nic.split("\n"):
                     if nic:
                         ip_cmd = ("ip route | grep %s " +
