@@ -34,6 +34,7 @@ led_sec = float(os.environ['BLINKY_INTERVAL_SEC']) \
     if 'BLINKY_INTERVAL_SEC' in os.environ else 1.0
 if led_sec < 0 or led_sec > 60:
     led_sec = 1.0
+online = False
 
 
 class Monitor(threading.Thread):
@@ -43,17 +44,27 @@ class Monitor(threading.Thread):
         super(Monitor, self).__init__()
         self.nic = nic
 
+    def terminate(self):
+        logger.error("LTEPi-II modem is terminated. Shutting down.")
+        # exit from non-main thread
+        os.kill(os.getpid(), signal.SIGTERM)
+
     def run(self):
+        global online
         while True:
             err = subprocess.call("ip route | grep %s" % self.nic,
                                   shell=True,
                                   stdout=Monitor.FNULL,
                                   stderr=subprocess.STDOUT)
             if err != 0:
-                logger.error("LTEPi-II modem is terminated. Shutting down.")
-                # exit from non-main thread
-                os.kill(os.getpid(), signal.SIGTERM)
-                break
+                return self.terminate()
+
+            err = subprocess.call("candy network show | grep ONLINE",
+                                  shell=True,
+                                  stdout=Monitor.FNULL,
+                                  stderr=subprocess.STDOUT)
+            online = (err == 0)
+
             err = subprocess.call("ip route | grep default | grep -v %s" %
                                   self.nic, shell=True, stdout=Monitor.FNULL,
                                   stderr=subprocess.STDOUT)
@@ -136,7 +147,9 @@ def modem_init2(serial_port, sock_path):
 
 
 def blinky():
-    global led, led_sec
+    global led, led_sec, online
+    if not online:
+        led = 1
     led = 0 if led != 0 else 1
     subprocess.call("echo %d > /sys/class/gpio/gpio4/value" % led,
                     shell=True, stdout=Monitor.FNULL,
@@ -148,10 +161,6 @@ def server_main(serial_port, nic,
                 sock_path='/var/run/candy-board-service.sock'):
     delete_sock_path(sock_path)
     atexit.register(delete_sock_path, sock_path)
-
-    logger.debug("server_main() : Setting up Monitor...")
-    monitor = Monitor(nic)
-    monitor.start()
 
     logger.debug("server_main() : Setting up SerialPort...")
     serial = candy_board_amt.SerialPort(serial_port, 115200)
@@ -165,9 +174,15 @@ def server_main(serial_port, nic,
     if 'BLINKY' in os.environ and os.environ['BLINKY'] == "1":
         logger.debug("server_main() : Starting blinky timer...")
         blinky()
+    logger.debug("server_main() : Setting up Monitor...")
+    monitor = Monitor(nic)
 
     logger.debug("server_main() : Starting SockServer...")
     server.start()
+
+    logger.debug("server_main() : Starting Monitor...")
+    monitor.start()
+
     logger.debug("server_main() : Joining Monitor thread into main...")
     monitor.join()
     logger.debug("server_main() : Joining SockServer thread into main...")
