@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 VENDOR_HOME=/opt/candy-line
 
@@ -163,17 +163,16 @@ function teardown {
 }
 
 function package {
-  rm -f ltepi2-*.tgz
+  rm -f $(basename ${GITHUB_ID})-*.tgz
   # http://unix.stackexchange.com/a/9865
   COPYFILE_DISABLE=1 tar --exclude="./.*" --exclude=Makefile -zcf $(basename ${GITHUB_ID})-${VERSION}.tgz *
 }
 
+# main
 if [ "$1" == "pack" ]; then
   package
   exit 0
 fi
-
-# main
 assert_root
 uninstall_if_installed
 setup

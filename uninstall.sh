@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 VENDOR_HOME=/opt/candy-line
 
