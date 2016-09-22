@@ -34,13 +34,15 @@ $ make
 ### 動作確認 (RPi)
 
 ```bash
-$ VERSION=1.1.1 && rm -fr tmp && mkdir tmp && cd tmp && \
+$ VERSION=1.3.0 && rm -fr tmp && mkdir tmp && cd tmp && \
   tar zxf ~/ltepi2-service-${VERSION}.tgz
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 ```
 
 # 履歴
+* 1.3.0
+    - [candy-iot-service](https://github.com/CANDY-LINE/candy-iot-service) との互換性を取るための変更を反映
 * 1.2.0
     - モデムによるインターネット接続時にのみLEDが点滅するように変更
 * 1.1.1

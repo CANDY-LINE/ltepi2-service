@@ -35,7 +35,7 @@ function exit_if_already_off {
 function power_off {
   # Make POWER_KEY high to turn off module (toggle)
   echo 1 > ${POWER_KEY_PIN}/value
-  sleep 2.5
+  sleep 3
   # Make POWER_KEY low after shutting down
   echo 0 > ${POWER_KEY_PIN}/value
 }

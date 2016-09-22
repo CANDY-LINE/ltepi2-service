@@ -23,6 +23,7 @@ import logging.handlers
 #                 e.g. /var/run/candy-board-service.sock
 # sys.argv[2] ... The network interface name to be monitored
 
+LED = 'gpio%s' % os.environ['LED2']
 logger = logging.getLogger('ltepi2')
 logger.setLevel(logging.INFO)
 handler = logging.handlers.SysLogHandler(address='/dev/log')
@@ -151,7 +152,7 @@ def blinky():
     if not online:
         led = 1
     led = 0 if led != 0 else 1
-    subprocess.call("echo %d > /sys/class/gpio/gpio4/value" % led,
+    subprocess.call("echo %d > /sys/class/gpio/%s/value" % (led, LED),
                     shell=True, stdout=Monitor.FNULL,
                     stderr=subprocess.STDOUT)
     threading.Timer(led_sec, blinky, ()).start()

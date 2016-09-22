@@ -38,3 +38,19 @@ RI_DIR="${RI_PIN}/direction"
 LED2=4
 LED2_PIN="/sys/class/gpio/gpio${LED2}"
 LED2_DIR="${LED2_PIN}/direction"
+
+function setup_ports {
+  for p in ${POWER_KEY} ${RESET_N} ${WWAN_DISABLE} ${TXD} ${RXD} ${RI} ${LED2}; do
+    [[ ! -f "/sys/class/gpio/gpio${p}/direction" ]] && echo  "${p}"  > /sys/class/gpio/export
+  done
+}
+
+function setup_pin_directions {
+  echo "out" > ${POWER_KEY_DIR}
+  echo "out" > ${RESET_N_DIR}
+  echo "out" > ${WWAN_DISABLE_DIR}
+  echo "in"  > ${TXD_DIR}
+  echo "out" > ${RXD_DIR}
+  echo "in"  > ${RI_DIR}
+  echo "out" > ${LED2_DIR}
+}
