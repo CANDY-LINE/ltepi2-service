@@ -9,7 +9,7 @@ VERSION=1.2.0
 NODEJS_VERSIONS="v0.12 v4.4"
 
 SERVICE_HOME=${VENDOR_HOME}/${SERVICE_NAME}
-SRC_DIR="${SRC_DIR:-/tmp/ltepi2-service-${VERSION}}"
+SRC_DIR="${SRC_DIR:-/tmp/$(basename ${GITHUB_ID})-${VERSION}}"
 CANDY_RED=${CANDY_RED:-1}
 KERNEL="${KERNEL:-$(uname -r)}"
 CONTAINER_MODE=0
@@ -63,18 +63,16 @@ function download {
   fi
 }
 
-function install_scripts {
-  download
-  info "Installing command lines to ${SERVICE_HOME}..."
-  install -o root -g root -D -m 755 ${SRC_DIR}/uninstall.sh ${SERVICE_HOME}/uninstall.sh
-
-  REBOOT=1
-}
-
 function install_candy_board {
-  apt-get update -qq
-  apt-get install -qq python-pip
-  pip install --upgrade candy-board-cli
+  RET=`which pip`
+  RET=$?
+  if [ "${RET}" != "0" ]; then
+    curl -L https://bootstrap.pypa.io/get-pip.py | /usr/bin/env python
+  fi
+
+  pip install --upgrade candy-board-cli \
+    --global-option=build \
+    --global-option="--executable=$(which python)"
   pip install --upgrade candy-board-amt
 }
 
@@ -151,6 +149,9 @@ function install_service {
 
   install -o root -g root -D -m 644 ${SRC_DIR}/systemd/${SERVICE_NAME}.service ${LIB_SYSTEMD}/system/
   systemctl enable ${SERVICE_NAME}
+
+  install -o root -g root -D -m 755 ${SRC_DIR}/uninstall.sh ${SERVICE_HOME}/uninstall.sh
+
   info "${SERVICE_NAME} service has been installed"
   REBOOT=1
 }
@@ -176,7 +177,6 @@ fi
 assert_root
 uninstall_if_installed
 setup
-install_scripts
 install_candy_board
 install_candy_red
 install_service
