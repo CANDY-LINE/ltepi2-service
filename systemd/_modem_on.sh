@@ -64,7 +64,7 @@ function power_on {
   echo 1 > ${WWAN_DISABLE_PIN}/value
   # Make POWER_KEY high to turn on module (toggle)
   echo 1 > ${POWER_KEY_PIN}/value
-  sleep 1.5
+  sleep 2
   # Make POWER_KEY low after booting
   echo 0 > ${POWER_KEY_PIN}/value
 }
