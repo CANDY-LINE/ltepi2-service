@@ -34,7 +34,7 @@ $ make
 ### 動作確認 (RPi)
 
 ```bash
-$ VERSION=1.1.1 && rm -fr tmp && mkdir tmp && cd tmp && \
+$ VERSION=1.2.0 && rm -fr tmp && mkdir tmp && cd tmp && \
   tar zxf ~/ltepi2-service-${VERSION}.tgz
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
