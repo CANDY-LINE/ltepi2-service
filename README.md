@@ -41,6 +41,8 @@ $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 ```
 
 # 履歴
+* 1.3.1
+    - pipインストール時に不要となったオプションを削除
 * 1.3.0
     - [candy-iot-service](https://github.com/CANDY-LINE/candy-iot-service) との互換性を取るための変更を反映
 * 1.2.0
