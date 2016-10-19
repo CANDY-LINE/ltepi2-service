@@ -4,7 +4,7 @@ VENDOR_HOME=/opt/candy-line
 
 SERVICE_NAME=ltepi2
 GITHUB_ID=CANDY-LINE/ltepi2-service
-VERSION=1.3.0
+VERSION=1.3.1
 
 NODEJS_VERSIONS="v0.12 v4.4"
 
@@ -70,9 +70,7 @@ function install_candy_board {
     curl -L https://bootstrap.pypa.io/get-pip.py | /usr/bin/env python
   fi
 
-  pip install --upgrade candy-board-cli \
-    --global-option=build \
-    --global-option="--executable=$(which python)"
+  pip install --upgrade candy-board-cli
   pip install --upgrade candy-board-amt
 }
 
