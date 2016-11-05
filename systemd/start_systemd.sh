@@ -125,12 +125,29 @@ function wait_for_default_route {
   done
 }
 
+function unregister_ftdi_sio {
+  if [ -d "/sys/bus/usb/drivers/ftdi_sio" ]; then
+    for d in `ls /sys/bus/usb/drivers/ftdi_sio | grep ":"`; do
+      echo -n ${d} > /sys/bus/usb/drivers/ftdi_sio/unbind
+    done
+    modprobe -r ftdi_sio
+  fi
+}
+
+function reregister_ftdi_sio {
+  if [ ! -d "/sys/bus/usb/drivers/ftdi_sio" ]; then
+    modprobe ftdi_sio
+  fi
+}
+
 function register_usbserial {
   # Registering a new id
   if [ -e "/sys/bus/usb-serial/drivers/pl2303" ]; then
     echo "1ecb 0208" > /sys/bus/usb-serial/drivers/pl2303/new_id
   else
+    unregister_ftdi_sio
     modprobe usbserial vendor=0x1ecb product=0x0208
+    reregister_ftdi_sio
   fi
 }
 
