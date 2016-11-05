@@ -34,13 +34,16 @@ $ make
 ### 動作確認 (RPi)
 
 ```bash
-$ VERSION=1.3.0 && rm -fr tmp && mkdir tmp && cd tmp && \
+$ VERSION=1.3.2 && rm -fr tmp && mkdir tmp && cd tmp && \
   tar zxf ~/ltepi2-service-${VERSION}.tgz
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 ```
 
 # 履歴
+* 1.3.2
+    - FTDI USBモジュールをRaspberry Piに差し込んだまま起動すると、LTEモデムが正しく動作しない問題を修正
+    - シャットダウン時にサービスが正常終了しない問題を修正
 * 1.3.1
     - pipインストール時に不要となったオプションを削除
 * 1.3.0
