@@ -9,3 +9,6 @@ BLINKY_INTERVAL_SEC=0.4
 
 # 1 for enabling fast-shutdown ('systemctl restart' should always fail though)
 FAST_SHUTDOWN=0
+
+# 1 for enabling Router-mode, 0 for enabling PPP Modem-mode
+ROUTER_ENABLED=%ROUTER_ENABLED%

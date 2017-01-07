@@ -17,6 +17,7 @@ if [ "${KERNEL}" != "$(uname -r)" ]; then
   CONTAINER_MODE=1
 fi
 WELCOME_FLOW_URL=https://git.io/vKhk3
+ROUTER_ENABLED=${ROUTER_ENABLED:-1}
 
 REBOOT=0
 
@@ -135,6 +136,7 @@ function install_service {
   cp -f ${SRC_DIR}/systemd/boot-apn.json ${SERVICE_HOME}
   cp -f ${SRC_DIR}/systemd/environment.txt ${SERVICE_HOME}/environment
   sed -i -e "s/%VERSION%/${VERSION//\//\\/}/g" ${SERVICE_HOME}/environment
+  sed -i -e "s/%ROUTER_ENABLED%/${ROUTER_ENABLED//\//\\/}/g" ${SERVICE_HOME}/environment
   FILES=`ls ${SRC_DIR}/systemd/*.sh`
   FILES="${FILES} `ls ${SRC_DIR}/systemd/server_*.py`"
   for f in ${FILES}
