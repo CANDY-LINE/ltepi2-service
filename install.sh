@@ -6,7 +6,7 @@ SERVICE_NAME=ltepi2
 GITHUB_ID=CANDY-LINE/ltepi2-service
 VERSION=1.3.2
 
-NODEJS_VERSIONS="v0.12 v4.4"
+NODEJS_VERSIONS="v4"
 
 SERVICE_HOME=${VENDOR_HOME}/${SERVICE_NAME}
 SRC_DIR="${SRC_DIR:-/tmp/$(basename ${GITHUB_ID})-${VERSION}}"
@@ -106,7 +106,7 @@ function install_candy_red {
       wget http://node-arm.herokuapp.com/node_archive_armhf.deb
       dpkg -i node_archive_armhf.deb
     else
-      curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
+      curl -sL https://deb.nodesource.com/setup_4.x | sudo bash -
       apt-get install -y nodejs
     fi
   fi
