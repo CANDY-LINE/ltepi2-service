@@ -41,8 +41,16 @@ function setup {
 
 function assert_root {
   if [[ $EUID -ne 0 ]]; then
-     echo "This script must be run as root"
+     alert "This script must be run as root"
      exit 1
+  fi
+}
+
+function test_connectivity {
+  curl --head --fail https://github.com
+  if [ "$?" != 0 ]; then
+    alert "Internet connection is required"
+    exit 1
   fi
 }
 
@@ -218,6 +226,7 @@ if [ "$1" == "pack" ]; then
   exit 0
 fi
 assert_root
+test_connectivity
 uninstall_if_installed
 setup
 install_ppp_mode
