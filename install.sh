@@ -18,6 +18,7 @@ if [ "${KERNEL}" != "$(uname -r)" ]; then
 fi
 WELCOME_FLOW_URL=https://git.io/vKhk3
 ROUTER_ENABLED=${ROUTER_ENABLED:-1}
+LTE_PING_INTERVAL_SEC=${LTE_PING_INTERVAL_SEC:-0}
 
 REBOOT=0
 
@@ -64,10 +65,44 @@ function download {
   fi
 }
 
+function _ufw_setup {
+  info "Configuring ufw..."
+  ufw --force disable
+  ufw deny in on ppp0
+  for n in `ls /sys/class/net`
+  do
+    if [ "${n}" != "lo" ] && [ "${n}" != "ppp0" ]; then
+      ufw allow in on ${n}
+      if [ "$?" != "0" ]; then
+        err "Failed to configure ufw for the network interface: ${n}"
+        exit 4
+      fi
+    fi
+  done
+  ufw --force enable
+}
+
+function install_ppp_mode {
+  if [ "${ROUTER_ENABLED}" != "0" ]; then
+    info "*** To be configured for ROUTER MODE ***"
+    return
+  fi
+  info "*** To be configured for PPP MODEM MODE ***"
+  info "Installing ufw and ppp..."
+  apt-get update -y
+  apt-get install -y ufw ppp pppconfig
+
+  cp -f ${SRC_DIR}/systemd/ltepi2.chatscript /etc/chatscripts/ltepi2
+  cp -f ${SRC_DIR}/systemd/ltepi2.peers /etc/ppp/peers/ltepi2
+
+  _ufw_setup
+}
+
 function install_candy_board {
   RET=`which pip`
   RET=$?
   if [ "${RET}" != "0" ]; then
+    info "Installing pip..."
     curl -L https://bootstrap.pypa.io/get-pip.py | /usr/bin/env python
   fi
 
@@ -79,7 +114,6 @@ function install_candy_red {
   if [ "${CANDY_RED}" == "0" ]; then
     return
   fi
-  info "Installing CANDY RED..."
   NODEJS_VER=`node -v`
   if [ "$?" == "0" ]; then
     for v in ${NODEJS_VERSIONS}
@@ -94,6 +128,7 @@ function install_candy_red {
   fi
   apt-get update -y
   if [ -n "${NODEJS_VER}" ]; then
+    info "Installing Node.js..."
     MODEL_NAME=`cat /proc/cpuinfo | grep "model name"`
     if [ "$?" != "0" ]; then
       alert "Unsupported environment"
@@ -110,9 +145,11 @@ function install_candy_red {
       apt-get install -y nodejs
     fi
   fi
+  info "Installing dependencies..."
   apt-get install -y python-dev python-rpi.gpio bluez libudev-dev
   cd ~
   npm cache clean
+  info "Installing CANDY-RED..."
   WELCOME_FLOW_URL=${WELCOME_FLOW_URL} NODE_OPTS=--max-old-space-size=128 npm install -g --unsafe-perm candy-red
   REBOOT=1
 }
@@ -137,6 +174,7 @@ function install_service {
   cp -f ${SRC_DIR}/systemd/environment.txt ${SERVICE_HOME}/environment
   sed -i -e "s/%VERSION%/${VERSION//\//\\/}/g" ${SERVICE_HOME}/environment
   sed -i -e "s/%ROUTER_ENABLED%/${ROUTER_ENABLED//\//\\/}/g" ${SERVICE_HOME}/environment
+  sed -i -e "s/%LTE_PING_INTERVAL_SEC%/${LTE_PING_INTERVAL_SEC//\//\\/}/g" ${SERVICE_HOME}/environment
   FILES=`ls ${SRC_DIR}/systemd/*.sh`
   FILES="${FILES} `ls ${SRC_DIR}/systemd/server_*.py`"
   for f in ${FILES}
@@ -177,6 +215,7 @@ fi
 assert_root
 uninstall_if_installed
 setup
+install_ppp_mode
 install_candy_board
 install_candy_red
 install_service

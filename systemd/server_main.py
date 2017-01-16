@@ -118,7 +118,20 @@ def resolve_boot_apn():
     return apn
 
 
-def modem_init1(serial_port, sock_path):
+def modem_init_acm(serial_port, sock_path):
+    delete_sock_path(sock_path)
+    atexit.register(delete_sock_path, sock_path)
+
+    serial = candy_board_amt.SerialPort(serial_port, 115200)
+    server = candy_board_amt.SockServer(resolve_version(),
+                                        resolve_boot_apn(),
+                                        sock_path, serial)
+    ret = server.perform({'category': 'modem', 'action': 'enable_acm'})
+    logger.debug("modem_init_ecm() : modem, enable_acm => %s" % ret)
+    sys.exit(json.loads(ret)['status'] != 'OK')
+
+
+def modem_init_ecm(serial_port, sock_path):
     delete_sock_path(sock_path)
     atexit.register(delete_sock_path, sock_path)
 
@@ -127,11 +140,11 @@ def modem_init1(serial_port, sock_path):
                                         resolve_boot_apn(),
                                         sock_path, serial)
     ret = server.perform({'category': 'modem', 'action': 'enable_ecm'})
-    logger.debug("modem_init1() : modem, enable_ecm => %s" % ret)
+    logger.debug("modem_init_ecm() : modem, enable_ecm => %s" % ret)
     sys.exit(json.loads(ret)['status'] != 'OK')
 
 
-def modem_init2(serial_port, sock_path):
+def modem_init_autoconn(serial_port, sock_path):
     delete_sock_path(sock_path)
     atexit.register(delete_sock_path, sock_path)
 
@@ -198,10 +211,12 @@ if __name__ == '__main__':
         logger.error("USB Ethernet Network Interface isn't ready. " +
                      "Shutting down.")
     elif len(sys.argv) > 3:
-        if sys.argv[3] == 'init1':
-            modem_init1(sys.argv[1], sys.argv[2])
-        elif sys.argv[3] == 'init2':
-            modem_init2(sys.argv[1], sys.argv[2])
+        if sys.argv[3] == 'init_acm':
+            modem_init_acm(sys.argv[1], sys.argv[2])
+        elif sys.argv[3] == 'init_ecm':
+            modem_init_ecm(sys.argv[1], sys.argv[2])
+        elif sys.argv[3] == 'init_autoconn':
+            modem_init_autoconn(sys.argv[1], sys.argv[2])
         else:
             logger.error("Do nothing: sys.argv[3]=%s" % sys.argv[3])
     else:

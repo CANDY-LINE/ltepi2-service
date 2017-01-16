@@ -33,18 +33,26 @@ function wait_for_modem_usb_active {
   done
 }
 
-function wait_for_modem_usb_acm_inactive {
+function _wait_for_usb_inactive {
   MAX=40
   COUNTER=0
   while [ ${COUNTER} -lt ${MAX} ];
   do
-    RET=`lsusb | grep 1ecb:0202`
+    RET=`lsusb | grep 1ecb:$1`
     if [ "$?" != "0" ]; then
       break
     fi
     sleep 1
     let COUNTER=COUNTER+1
   done
+}
+
+function wait_for_modem_usb_acm_inactive {
+  _wait_for_usb_inactive "0202"
+}
+
+function wait_for_modem_usb_ecm_inactive {
+  _wait_for_usb_inactive "0208"
 }
 
 function wait_for_modem_usb_inactive {
@@ -80,9 +88,9 @@ function look_for_serial_port {
   log "${MODEM_SERIAL_PORT} is selected"
 }
 
-function change_usb_data_conn {
-  log "Modifying the USB data connection I/F to ECM"
-  /usr/bin/env python /opt/candy-line/${PRODUCT_DIR_NAME}/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init1
+function _change_to {
+  log "Modifying the USB data connection I/F to $1"
+  /usr/bin/env python /opt/candy-line/${PRODUCT_DIR_NAME}/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock $2
   RET=$?
   if [ "${RET}" == "0" ]; then
     log "Restarting modem..."
@@ -91,9 +99,17 @@ function change_usb_data_conn {
   fi
 }
 
+function change_to_acm {
+  _change_to "ACM" "init_acm"
+}
+
+function change_to_ecm {
+  _change_to "ECM" "init_ecm"
+}
+
 function enable_auto_connect {
   log "Enabling auto-connect mode"
-  /usr/bin/env python /opt/candy-line/${PRODUCT_DIR_NAME}/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init2
+  /usr/bin/env python /opt/candy-line/${PRODUCT_DIR_NAME}/server_main.py ${MODEM_SERIAL_PORT} /var/run/candy-board-service.sock init_autoconn
   RET=$?
   if [ "${RET}" == "1" ]; then
     RET=`uname -r | grep edison`
@@ -143,10 +159,18 @@ function reregister_ftdi_sio {
 function register_usbserial {
   # Registering a new id
   if [ -e "/sys/bus/usb-serial/drivers/pl2303" ]; then
-    echo "1ecb 0208" > /sys/bus/usb-serial/drivers/pl2303/new_id
+    if [ "${MODEM_USB_MODE}" == "ACM" ]; then
+      echo "1ecb 0202" > /sys/bus/usb-serial/drivers/pl2303/new_id
+    else
+      echo "1ecb 0208" > /sys/bus/usb-serial/drivers/pl2303/new_id
+    fi
   else
     unregister_ftdi_sio
-    modprobe usbserial vendor=0x1ecb product=0x0208
+    if [ "${MODEM_USB_MODE}" == "ACM" ]; then
+      modprobe usbserial vendor=0x1ecb product=0x0202
+    else
+      modprobe usbserial vendor=0x1ecb product=0x0208
+    fi
     reregister_ftdi_sio
   fi
 }
@@ -157,24 +181,48 @@ function diagnose_self {
     return
   fi
 
-  if [ "${MODEM_USB_MODE}" == "ACM" ]; then
-    MODEM_USB_MODE=""
+  if [ "${ROUTER_ENABLED}" == "1" ]; then
+    # Use ECM for ROUTER MODE
+    if [ "${MODEM_USB_MODE}" == "ACM" ]; then
+      MODEM_USB_MODE=""
 
-    look_for_serial_port
-    change_usb_data_conn
-    wait_for_modem_usb_acm_inactive
-    wait_for_modem_usb_active
-    if [ -z "${MODEM_USB_MODE}" ]; then
-      return
-    fi
+      look_for_serial_port
+      change_to_ecm
+      wait_for_modem_usb_acm_inactive
+      wait_for_modem_usb_active
+      if [ -z "${MODEM_USB_MODE}" ]; then
+        return
+      fi
 
-    register_usbserial
-    look_for_serial_port
-    enable_auto_connect
-    wait_for_modem_usb_active
-    if [ -z "${MODEM_USB_MODE}" ]; then
-      return
+      register_usbserial
+      look_for_serial_port
+      enable_auto_connect
+      wait_for_modem_usb_active
+      if [ -z "${MODEM_USB_MODE}" ]; then
+        return
+      fi
     fi
+  else
+    # Use ACM for PPP MODEM MODE
+    if [ "${MODEM_USB_MODE}" == "ECM" ]; then
+      MODEM_USB_MODE=""
+
+      look_for_serial_port
+      change_to_acm
+      wait_for_modem_usb_ecm_inactive
+      wait_for_modem_usb_active
+      if [ -z "${MODEM_USB_MODE}" ]; then
+        return
+      fi
+
+      register_usbserial
+      look_for_serial_port
+      wait_for_modem_usb_active
+      if [ -z "${MODEM_USB_MODE}" ]; then
+        return
+      fi
+    fi
+    pon ltepi2
   fi
 }
 
@@ -221,7 +269,7 @@ diagnose_self
 activate_lte
 
 # end banner
-if [ "${MODEM_USB_MODE}" == "ECM" ]; then
+if [ "${MODEM_USB_MODE}" == "ECM" ] || [ "${MODEM_USB_MODE}" == "ACM" ]; then
   log "${PRODUCT} is initialized successfully!"
   /usr/bin/env python /opt/candy-line/${PRODUCT_DIR_NAME}/server_main.py ${MODEM_SERIAL_PORT} ${IF_NAME}
 else
