@@ -231,8 +231,8 @@ assert_root
 test_connectivity
 uninstall_if_installed
 setup
-install_ppp_mode
 install_candy_board
 install_candy_red
 install_service
+install_ppp_mode
 teardown
