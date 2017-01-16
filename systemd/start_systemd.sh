@@ -141,6 +141,18 @@ function wait_for_default_route {
   done
 }
 
+function remove_default_routes {
+  for n in `ls /sys/class/net`
+  do
+    if [ "${n}" != "lo" ] && [ "${n}" != "ppp0" ]; then
+      IP=`ip route | grep ${n} | awk '/default/ { print $3 }'`
+      if [ -n "${IP}" ]; then
+        ip route del default via ${IP}
+      fi
+    fi
+  done
+}
+
 function unregister_ftdi_sio {
   if [ -d "/sys/bus/usb/drivers/ftdi_sio" ]; then
     for d in `ls /sys/bus/usb/drivers/ftdi_sio | grep ":"`; do
@@ -225,6 +237,7 @@ function diagnose_self {
     fi
     # prune all pppd processes prior to starting a new pppd
     poff
+    remove_default_routes
     pon ltepi2
   fi
 }
@@ -263,7 +276,9 @@ function activate_lte {
     log "The interface [${IF_NAME}] is up!"
     register_usbserial
     look_for_serial_port
-    wait_for_default_route
+    if [ "${ROUTER_ENABLED}" == "1" ]; then
+      wait_for_default_route
+    fi
   fi
 }
 
