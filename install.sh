@@ -5,6 +5,7 @@ VENDOR_HOME=/opt/candy-line
 SERVICE_NAME=ltepi2
 GITHUB_ID=CANDY-LINE/ltepi2-service
 VERSION=1.3.2
+BOOT_APN=${BOOT_APN:-umobile.jp}
 
 NODEJS_VERSIONS="v4"
 
@@ -156,6 +157,10 @@ function install_candy_red {
 
 function install_service {
   info "Installing system service ..."
+  if [ ! -f "${SRC_DIR}/systemd/boot-apn.${BOOT_APN}.json" ]; then
+    err "Invalid BOOT_APN value => ${BOOT_APN}"
+    exit 1
+  fi
   RET=`systemctl | grep ${SERVICE_NAME}.service | grep -v not-found`
   RET=$?
   if [ "${RET}" == "0" ]; then
@@ -170,7 +175,7 @@ function install_service {
   LIB_SYSTEMD="${LIB_SYSTEMD}/lib/systemd"
 
   mkdir -p ${SERVICE_HOME}
-  cp -f ${SRC_DIR}/systemd/boot-apn.json ${SERVICE_HOME}
+  cp -f ${SRC_DIR}/systemd/boot-apn.${BOOT_APN}.json ${SERVICE_HOME}/boot-apn.json
   cp -f ${SRC_DIR}/systemd/environment.txt ${SERVICE_HOME}/environment
   sed -i -e "s/%VERSION%/${VERSION//\//\\/}/g" ${SERVICE_HOME}/environment
   sed -i -e "s/%ROUTER_ENABLED%/${ROUTER_ENABLED//\//\\/}/g" ${SERVICE_HOME}/environment
