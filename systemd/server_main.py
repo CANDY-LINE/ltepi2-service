@@ -62,7 +62,7 @@ class Pinger(threading.Thread):
 
     def run(self):
         while self.interval_sec >= 5:
-            if not os.path.isfile(CAT_PPP0_TX_STAT):
+            if not os.path.isfile(Pinger.CAT_PPP0_TX_STAT):
                 time.sleep(self.interval_sec)
                 continue
             try:
