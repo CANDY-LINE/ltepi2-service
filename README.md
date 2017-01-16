@@ -49,6 +49,7 @@ $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 # 履歴
 * 2.0.0
     - CANDY-REDをインストールする場合に、Node.js v4.xをインストールするように変更。Node-RED v0.16.0より Node.js v0.12がサポート外となったため。**すでにv0.12が入っている場合はアンインストールされて、入れ替えられます。ご注意ください**
+    - `sudo systemctl stop ltepi2`を実行するとインターネットへ接続できなくなるので、ラズパイ本体の再起動を行うこと
 * 1.3.2
     - FTDI USBモジュールをRaspberry Piに差し込んだまま起動すると、LTEモデムが正しく動作しない問題を修正
     - シャットダウン時にサービスが正常終了しない問題を修正

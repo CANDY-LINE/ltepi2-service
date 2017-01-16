@@ -73,13 +73,6 @@ function inactivate_lte {
   if [ -n "${IF_NAME}" ]; then
     ifconfig ${IF_NAME} down
     logger -t ${PRODUCT_DIR_NAME} "The interface [${IF_NAME}] is down!"
-
-    RET=`ifconfig wlan0`
-    RET=$?
-    if [ "${RET}" == "0" ]; then
-      ifconfig "wlan0" down
-      ifconfig "wlan0" up
-    fi
   fi
 }
 
