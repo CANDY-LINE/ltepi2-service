@@ -35,9 +35,49 @@ led_sec = float(os.environ['BLINKY_INTERVAL_SEC']) \
     if 'BLINKY_INTERVAL_SEC' in os.environ else 1.0
 if led_sec < 0 or led_sec > 60:
     led_sec = 1.0
+lte_ping_interval_sec = float(os.environ['LTE_PING_INTERVAL_SEC']) \
+    if 'LTE_PING_INTERVAL_SEC' in os.environ else 0.0
+router_enabled = (int(os.environ['ROUTER_ENABLED']) == 1) \
+    if 'ROUTER_ENABLED' in os.environ else True
 online = False
 shutdown_state_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                                    '__shutdown')
+
+
+class Pinger(threading.Thread):
+    DEST_ADDR = '<broadcast>'
+    DEST_PORT = 60100
+    CAT_PPP0_TX_STAT = 'cat /sys/class/net/ppp0/statistics/tx_bytes'
+
+    def __init__(self, interval_sec):
+        super(Pinger, self).__init__()
+        if router_enabled:
+            self.interval_sec = 0
+        else:
+            self.interval_sec = interval_sec
+        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        self.socket.bind(('', 0))
+        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        self.last_tx_bytes = 0
+
+    def run(self):
+        while self.interval_sec >= 5:
+            if not os.path.isfile(Pinger.CAT_PPP0_TX_STAT):
+                time.sleep(self.interval_sec)
+                continue
+            try:
+                self.tx_bytes = subprocess.Popen(Pinger.CAT_PPP0_TX_STAT,
+                                                 shell=True,
+                                                 stdout=subprocess.PIPE
+                                                 ).stdout.read()
+                if int(self.tx_bytes) != self.last_tx_bytes:
+                    self.socket.sendto('',
+                                       (Pinger.DEST_ADDR, Pinger.DEST_PORT))
+                    time.sleep(self.interval_sec)
+                    self.last_tx_bytes = int(self.tx_bytes)
+            except:
+                time.sleep(self.interval_sec)
+                pass
 
 
 class Monitor(threading.Thread):
@@ -49,47 +89,59 @@ class Monitor(threading.Thread):
 
     def terminate(self):
         if os.path.isfile(shutdown_state_file):
-            return
+            return False
         logger.error("LTEPi-II modem is terminated. Shutting down.")
         # exit from non-main thread
         os.kill(os.getpid(), signal.SIGTERM)
+        return True
 
     def run(self):
         global online
         while True:
-            err = subprocess.call("ip route | grep %s" % self.nic,
-                                  shell=True,
-                                  stdout=Monitor.FNULL,
-                                  stderr=subprocess.STDOUT)
-            if err != 0:
-                return self.terminate()
-
-            err = subprocess.call("candy network show | grep ONLINE",
-                                  shell=True,
-                                  stdout=Monitor.FNULL,
-                                  stderr=subprocess.STDOUT)
-            online = (err == 0)
-
-            err = subprocess.call("ip route | grep default | grep -v %s" %
-                                  self.nic, shell=True, stdout=Monitor.FNULL,
-                                  stderr=subprocess.STDOUT)
-            if err == 0:
-                ls_nic_cmd = ("ip route | grep default | grep -v %s " +
-                              "| tr -s ' ' | cut -d ' ' -f 5") % self.nic
-                ls_nic = subprocess.Popen(ls_nic_cmd,
+            try:
+                if router_enabled:
+                    err = subprocess.call("ip route | grep %s" % self.nic,
                                           shell=True,
-                                          stdout=subprocess.PIPE).stdout.read()
-                logger.debug("ls_nic => %s" % ls_nic)
-                for nic in ls_nic.split("\n"):
-                    if nic:
-                        ip_cmd = ("ip route | grep %s " +
-                                  "| awk '/default/ { print $3 }'") % nic
-                        ip = subprocess.Popen(ip_cmd, shell=True,
+                                          stdout=Monitor.FNULL,
+                                          stderr=subprocess.STDOUT)
+                    if err != 0 and not self.terminate():
+                        continue
+
+                err = subprocess.call("candy network show | grep ONLINE",
+                                      shell=True,
+                                      stdout=Monitor.FNULL,
+                                      stderr=subprocess.STDOUT)
+                online = (err == 0)
+                if not online:
+                    continue
+
+                err = subprocess.call("ip route | grep default | grep -v %s" %
+                                      self.nic, shell=True,
+                                      stdout=Monitor.FNULL,
+                                      stderr=subprocess.STDOUT)
+                if err == 0:
+                    ls_nic_cmd = ("ip route | grep default | grep -v %s " +
+                                  "| tr -s ' ' | cut -d ' ' -f 5") % self.nic
+                    ls_nic = subprocess.Popen(ls_nic_cmd,
+                                              shell=True,
                                               stdout=subprocess.PIPE
                                               ).stdout.read()
-                        subprocess.call("ip route del default via %s" % ip,
-                                        shell=True)
-            time.sleep(5)
+                    logger.debug("ls_nic => %s" % ls_nic)
+                    for nic in ls_nic.split("\n"):
+                        if nic:
+                            ip_cmd = ("ip route | grep %s " +
+                                      "| awk '/default/ { print $3 }'") % nic
+                            ip = subprocess.Popen(ip_cmd, shell=True,
+                                                  stdout=subprocess.PIPE
+                                                  ).stdout.read()
+                            subprocess.call("ip route del default via %s" % ip,
+                                            shell=True)
+                time.sleep(5)
+
+            except:
+                logger.error("Error on monitoring")
+                if not self.terminate():
+                    continue
 
 
 def delete_sock_path(sock_path):
@@ -118,7 +170,20 @@ def resolve_boot_apn():
     return apn
 
 
-def modem_init1(serial_port, sock_path):
+def modem_init_acm(serial_port, sock_path):
+    delete_sock_path(sock_path)
+    atexit.register(delete_sock_path, sock_path)
+
+    serial = candy_board_amt.SerialPort(serial_port, 115200)
+    server = candy_board_amt.SockServer(resolve_version(),
+                                        resolve_boot_apn(),
+                                        sock_path, serial)
+    ret = server.perform({'category': 'modem', 'action': 'enable_acm'})
+    logger.debug("modem_init_ecm() : modem, enable_acm => %s" % ret)
+    sys.exit(json.loads(ret)['status'] != 'OK')
+
+
+def modem_init_ecm(serial_port, sock_path):
     delete_sock_path(sock_path)
     atexit.register(delete_sock_path, sock_path)
 
@@ -127,11 +192,11 @@ def modem_init1(serial_port, sock_path):
                                         resolve_boot_apn(),
                                         sock_path, serial)
     ret = server.perform({'category': 'modem', 'action': 'enable_ecm'})
-    logger.debug("modem_init1() : modem, enable_ecm => %s" % ret)
+    logger.debug("modem_init_ecm() : modem, enable_ecm => %s" % ret)
     sys.exit(json.loads(ret)['status'] != 'OK')
 
 
-def modem_init2(serial_port, sock_path):
+def modem_init_autoconn(serial_port, sock_path):
     delete_sock_path(sock_path)
     atexit.register(delete_sock_path, sock_path)
 
@@ -141,7 +206,8 @@ def modem_init2(serial_port, sock_path):
                                         sock_path, serial)
     ret = server.perform({'category': 'modem',
                           'action': 'enable_auto_connect'})
-    logger.debug("modem_init2() : modem, enable_auto_connect => %s" % ret)
+    logger.debug("modem_init_autoconn() : modem, enable_auto_connect => %s" %
+                 ret)
     ret = json.loads(ret)
     if ret['status'] == 'OK':
         if ret['result'] == 'Already Enabled':
@@ -156,10 +222,24 @@ def blinky():
     if not online:
         led = 1
     led = 0 if led != 0 else 1
-    subprocess.call("echo %d > /sys/class/gpio/%s/value" % (led, LED),
-                    shell=True, stdout=Monitor.FNULL,
-                    stderr=subprocess.STDOUT)
-    threading.Timer(led_sec, blinky, ()).start()
+    if led == 0 or router_enabled:
+        subprocess.call("echo %d > /sys/class/gpio/%s/value" % (led, LED),
+                        shell=True, stdout=Monitor.FNULL,
+                        stderr=subprocess.STDOUT)
+        threading.Timer(led_sec, blinky, ()).start()
+    else:
+        subprocess.call("echo %d > /sys/class/gpio/%s/value" % (1, LED),
+                        shell=True, stdout=Monitor.FNULL,
+                        stderr=subprocess.STDOUT)
+        time.sleep(led_sec / 3)
+        subprocess.call("echo %d > /sys/class/gpio/%s/value" % (0, LED),
+                        shell=True, stdout=Monitor.FNULL,
+                        stderr=subprocess.STDOUT)
+        time.sleep(led_sec / 3)
+        subprocess.call("echo %d > /sys/class/gpio/%s/value" % (1, LED),
+                        shell=True, stdout=Monitor.FNULL,
+                        stderr=subprocess.STDOUT)
+        threading.Timer(led_sec / 3, blinky, ()).start()
 
 
 def server_main(serial_port, nic,
@@ -181,27 +261,35 @@ def server_main(serial_port, nic,
         blinky()
     logger.debug("server_main() : Setting up Monitor...")
     monitor = Monitor(nic)
+    logger.debug("server_main() : Setting up Pinger...")
+    pinger = Pinger(lte_ping_interval_sec)
 
     logger.debug("server_main() : Starting SockServer...")
     server.start()
-
     logger.debug("server_main() : Starting Monitor...")
     monitor.start()
+    logger.debug("server_main() : Starting Pinger...")
+    pinger.start()
 
     logger.debug("server_main() : Joining Monitor thread into main...")
     monitor.join()
+    logger.debug("server_main() : Joining Pinger thread into main...")
+    pinger.join()
     logger.debug("server_main() : Joining SockServer thread into main...")
     server.join()
+
 
 if __name__ == '__main__':
     if len(sys.argv) < 3:
         logger.error("USB Ethernet Network Interface isn't ready. " +
                      "Shutting down.")
     elif len(sys.argv) > 3:
-        if sys.argv[3] == 'init1':
-            modem_init1(sys.argv[1], sys.argv[2])
-        elif sys.argv[3] == 'init2':
-            modem_init2(sys.argv[1], sys.argv[2])
+        if sys.argv[3] == 'init_acm':
+            modem_init_acm(sys.argv[1], sys.argv[2])
+        elif sys.argv[3] == 'init_ecm':
+            modem_init_ecm(sys.argv[1], sys.argv[2])
+        elif sys.argv[3] == 'init_autoconn':
+            modem_init_autoconn(sys.argv[1], sys.argv[2])
         else:
             logger.error("Do nothing: sys.argv[3]=%s" % sys.argv[3])
     else:

@@ -1,0 +1,10 @@
+#debug
+connect "/usr/sbin/chat -v -f /etc/chatscripts/ltepi2"
+/dev/ttyACM0
+hide-password
+noauth
+115200
+defaultroute
+noipdefault
+persist
+usepeerdns
