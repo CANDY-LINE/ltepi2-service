@@ -46,6 +46,10 @@ $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ROUTER_ENABLED=0 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ROUTER_ENABLED=0 LTE_PING_INTERVAL_SEC=5 ./install.sh
+
+$ time sudo SRC_DIR=$(pwd) ./uninstall.sh
+$ time sudo SRC_DIR=$(pwd) ROUTER_ENABLED=0 ./uninstall.sh
+
 ```
 
 # 履歴
