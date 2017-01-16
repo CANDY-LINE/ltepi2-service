@@ -12,3 +12,6 @@ FAST_SHUTDOWN=0
 
 # 1 for enabling Router-mode, 0 for enabling PPP Modem-mode
 ROUTER_ENABLED=%ROUTER_ENABLED%
+
+# Network retaining request interval in PPP Modem-mode (<5:disabled)
+LTE_PING_INTERVAL_SEC=%LTE_PING_INTERVAL_SEC%
