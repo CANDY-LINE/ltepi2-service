@@ -59,6 +59,8 @@ function uninstall_if_installed {
     ${SERVICE_HOME}/uninstall.sh > /dev/null
     systemctl daemon-reload
     info "Existing version of ltepi2 has been uninstalled"
+    alert "Please reboot the system (enter 'sudo reboot') and run the installation command again"
+    exit 1
   fi
 }
 
