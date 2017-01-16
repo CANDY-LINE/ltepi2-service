@@ -207,6 +207,7 @@ function diagnose_self {
     if [ "${MODEM_USB_MODE}" == "ECM" ]; then
       MODEM_USB_MODE=""
 
+      register_usbserial
       look_for_serial_port
       change_to_acm
       wait_for_modem_usb_ecm_inactive
