@@ -222,6 +222,8 @@ function diagnose_self {
         return
       fi
     fi
+    # prune all pppd processes prior to starting a new pppd
+    poff
     pon ltepi2
   fi
 }
@@ -233,29 +235,34 @@ function activate_lte {
   fi
 
   log "Activating LTE/3G Module..."
-  USB_ID=`dmesg | grep "New USB device found, idVendor=1ecb, idProduct=0208" | sed 's/^.*\] //g' | cut -f 1 -d ':' | cut -f 2 -d ' ' | tail -1`
-  # when renamed
-  IF_NAME=`dmesg | grep "renamed network interface usb1" | sed 's/^.* usb1 to //g' | cut -f 1 -d ' ' | tail -1`
-  if [ -z "${IF_NAME}" ]; then
-    IF_NAME=`dmesg | grep " ${USB_ID}" | grep "register 'cdc_ether'" | cut -f 2 -d ':' | cut -f 2 -d ' ' | tail -1`
+  if [ "${MODEM_USB_MODE}" == "ACM" ]; then
+    IF_NAME="ppp0"
+  else
+    USB_ID=`dmesg | grep "New USB device found, idVendor=1ecb, idProduct=0208" | sed 's/^.*\] //g' | cut -f 1 -d ':' | cut -f 2 -d ' ' | tail -1`
+    # when renamed
+    IF_NAME=`dmesg | grep "renamed network interface usb1" | sed 's/^.* usb1 to //g' | cut -f 1 -d ' ' | tail -1`
+    if [ -z "${IF_NAME}" ]; then
+      IF_NAME=`dmesg | grep " ${USB_ID}" | grep "register 'cdc_ether'" | cut -f 2 -d ':' | cut -f 2 -d ' ' | tail -1`
+    fi
+    if [ -n "${IF_NAME}" ]; then
+      ifconfig ${IF_NAME} up
+      RET=`which udhcpc`
+      RET=$?
+      if [ "${RET}" == "0" ]; then
+        if [ -f "/var/run/udhcpc-${IF_NAME}.pid" ]; then
+          cat "/var/run/udhcpc-${IF_NAME}.pid" | xargs kill -9
+        fi
+        udhcpc -i ${IF_NAME} -p /var/run/udhcpc-${IF_NAME}.pid -S
+      fi
+    else
+      IF_NAME=""
+    fi
   fi
   if [ -n "${IF_NAME}" ]; then
-    ifconfig ${IF_NAME} up
-    RET=`which udhcpc`
-    RET=$?
-    if [ "${RET}" == "0" ]; then
-      if [ -f "/var/run/udhcpc-${IF_NAME}.pid" ]; then
-        cat "/var/run/udhcpc-${IF_NAME}.pid" | xargs kill -9
-      fi
-      udhcpc -i ${IF_NAME} -p /var/run/udhcpc-${IF_NAME}.pid -S
-    fi
     log "The interface [${IF_NAME}] is up!"
     register_usbserial
     look_for_serial_port
     wait_for_default_route
-
-  else
-    IF_NAME=""
   fi
 }
 

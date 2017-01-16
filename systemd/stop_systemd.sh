@@ -10,6 +10,16 @@ function led_off {
   echo 0 > ${LED2_PIN}/value
 }
 
+function stop_ppp {
+  if [ "${ROUTER_ENABLED}" == "0" ]; then
+    poff
+    sleep 17
+    poff
+    sleep 18
+    poff
+  fi
+}
+
 function wait_for_modem_usb_inactive {
   if [ "${FAST_SHUTDOWN}" == "1" ]; then
     logger -t ${PRODUCT_DIR_NAME} "[FAST_SHUTDOWN] Skipping to monitor USB status..."
@@ -77,6 +87,7 @@ function inactivate_lte {
 logger -t ${PRODUCT_DIR_NAME} "Inactivating ${PRODUCT}..."
 touch ${SHUDOWN_STATE_FILE}
 
+stop_ppp
 diagnose_self
 inactivate_lte
 /opt/candy-line/${PRODUCT_DIR_NAME}/_modem_off.sh > /dev/null 2>&1
