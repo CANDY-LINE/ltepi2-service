@@ -44,6 +44,8 @@ $ VERSION=1.3.2 && rm -fr tmp && mkdir tmp && cd tmp && \
   tar zxf ~/ltepi2-service-${VERSION}.tgz
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ROUTER_ENABLED=0 ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ROUTER_ENABLED=0 LTE_PING_INTERVAL_SEC=5 ./install.sh
 ```
 
 # 履歴
