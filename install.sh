@@ -4,7 +4,7 @@ VENDOR_HOME=/opt/candy-line
 
 SERVICE_NAME=ltepi2
 GITHUB_ID=CANDY-LINE/ltepi2-service
-VERSION=1.3.2
+VERSION=2.0.0
 BOOT_APN=${BOOT_APN:-umobile.jp}
 
 NODEJS_VERSIONS="v4"
@@ -47,7 +47,7 @@ function assert_root {
 }
 
 function test_connectivity {
-  curl --head --fail https://github.com
+  curl --head --fail -o /dev/null https://github.com 2>&1
   if [ "$?" != 0 ]; then
     alert "Internet connection is required"
     exit 1
@@ -59,6 +59,8 @@ function uninstall_if_installed {
     ${SERVICE_HOME}/uninstall.sh > /dev/null
     systemctl daemon-reload
     info "Existing version of ltepi2 has been uninstalled"
+    alert "Please reboot the system (enter 'sudo reboot') and run the installation command again"
+    exit 1
   fi
 }
 

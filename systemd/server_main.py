@@ -62,7 +62,7 @@ class Pinger(threading.Thread):
 
     def run(self):
         while self.interval_sec >= 5:
-            if not os.path.isfile(CAT_PPP0_TX_STAT):
+            if not os.path.isfile(Pinger.CAT_PPP0_TX_STAT):
                 time.sleep(self.interval_sec)
                 continue
             try:
@@ -89,27 +89,31 @@ class Monitor(threading.Thread):
 
     def terminate(self):
         if os.path.isfile(shutdown_state_file):
-            return
+            return False
         logger.error("LTEPi-II modem is terminated. Shutting down.")
         # exit from non-main thread
         os.kill(os.getpid(), signal.SIGTERM)
+        return True
 
     def run(self):
         global online
         while True:
             try:
-                err = subprocess.call("ip route | grep %s" % self.nic,
-                                      shell=True,
-                                      stdout=Monitor.FNULL,
-                                      stderr=subprocess.STDOUT)
-                if err != 0 and self.terminate():
-                    continue
+                if router_enabled:
+                    err = subprocess.call("ip route | grep %s" % self.nic,
+                                          shell=True,
+                                          stdout=Monitor.FNULL,
+                                          stderr=subprocess.STDOUT)
+                    if err != 0 and not self.terminate():
+                        continue
 
                 err = subprocess.call("candy network show | grep ONLINE",
                                       shell=True,
                                       stdout=Monitor.FNULL,
                                       stderr=subprocess.STDOUT)
                 online = (err == 0)
+                if not online:
+                    continue
 
                 err = subprocess.call("ip route | grep default | grep -v %s" %
                                       self.nic, shell=True,
@@ -136,7 +140,7 @@ class Monitor(threading.Thread):
 
             except:
                 logger.error("Error on monitoring")
-                if self.terminate():
+                if not self.terminate():
                     continue
 
 
