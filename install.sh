@@ -167,16 +167,16 @@ function install_candy_red {
 
 function install_service {
   info "Installing system service ..."
-  if [ ! -f "${SRC_DIR}/systemd/boot-apn.${BOOT_APN}.json" ]; then
-    err "Invalid BOOT_APN value => ${BOOT_APN}"
-    exit 1
-  fi
   RET=`systemctl | grep ${SERVICE_NAME}.service | grep -v not-found`
   RET=$?
   if [ "${RET}" == "0" ]; then
     return
   fi
   download
+  if [ ! -f "${SRC_DIR}/systemd/boot-apn.${BOOT_APN}.json" ]; then
+    err "Invalid BOOT_APN value => ${BOOT_APN}"
+    exit 1
+  fi
 
   LIB_SYSTEMD="$(dirname $(dirname $(which systemctl)))"
   if [ "${LIB_SYSTEMD}" == "/" ]; then
