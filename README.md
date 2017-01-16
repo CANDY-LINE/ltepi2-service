@@ -31,6 +31,12 @@ $ make
 (enter RPi password)
 ```
 
+ホストを指定するときは、`PI_HOST`を指定する。
+```bash
+$ make PI_HOST=shinycandypi.local
+(enter RPi password)
+```
+
 ### 動作確認 (RPi)
 
 ```bash
