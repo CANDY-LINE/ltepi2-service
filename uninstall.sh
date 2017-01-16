@@ -26,6 +26,31 @@ function assert_root {
   fi
 }
 
+function uninstall_ppp_mode {
+  PPP_MODE_DETECTED=0
+  for f in "/etc/chatscripts/ltepi2" "/etc/ppp/peers/ltepi2"
+  do
+    if [ -f "${f}" ]; then
+      rm -f "${f}"
+      PPP_MODE_DETECTED=1
+    fi
+  done
+  if [ "${PPP_MODE_DETECTED}" == "0" ]; then
+    return
+  fi
+
+  RET=`which ufw`
+  RET=$?
+  if [ "${RET}" == "0" ]; then
+    ufw --force disable
+    OUTPUT=`ufw --force reset`
+    for f in `${echo $OUTPUT | grep -oP "/etc/ufw/[0-9a-zA-Z_\.]*"}`
+    do
+      rm -f ${f}
+    done
+  fi
+}
+
 function uninstall_candy_board {
   pip uninstall -y candy-board-amt
   pip uninstall -y candy-board-cli
@@ -63,4 +88,5 @@ function teardown {
 assert_root
 uninstall_service
 uninstall_candy_board
+uninstall_ppp_mode
 teardown

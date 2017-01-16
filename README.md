@@ -31,6 +31,12 @@ $ make
 (enter RPi password)
 ```
 
+ホストを指定するときは、`PI_HOST`を指定する。
+```bash
+$ make PI_HOST=shinycandypi.local
+(enter RPi password)
+```
+
 ### 動作確認 (RPi)
 
 ```bash
@@ -38,9 +44,16 @@ $ VERSION=1.3.2 && rm -fr tmp && mkdir tmp && cd tmp && \
   tar zxf ~/ltepi2-service-${VERSION}.tgz
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ROUTER_ENABLED=0 ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ROUTER_ENABLED=0 LTE_PING_INTERVAL_SEC=5 ./install.sh
+
+$ time sudo /opt/candy-line/ltepi2/uninstall.sh
 ```
 
 # 履歴
+* 2.0.0
+    - CANDY-REDをインストールする場合に、Node.js v4.xをインストールするように変更。Node-RED v0.16.0より Node.js v0.12がサポート外となったため。**すでにv0.12が入っている場合はアンインストールされて、入れ替えられます。ご注意ください**
+    - `sudo systemctl stop ltepi2`を実行するとインターネットへ接続できなくなるので、ラズパイ本体の再起動を行うこと
 * 1.3.2
     - FTDI USBモジュールをRaspberry Piに差し込んだまま起動すると、LTEモデムが正しく動作しない問題を修正
     - シャットダウン時にサービスが正常終了しない問題を修正
