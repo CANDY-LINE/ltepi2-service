@@ -186,6 +186,7 @@ function install_service {
 
   mkdir -p ${SERVICE_HOME}
   cp -f ${SRC_DIR}/systemd/boot-apn.${BOOT_APN}.json ${SERVICE_HOME}/boot-apn.json
+  cp -f ${SRC_DIR}/systemd/boot-ip.*.json ${SERVICE_HOME}
   cp -f ${SRC_DIR}/systemd/environment.txt ${SERVICE_HOME}/environment
   sed -i -e "s/%VERSION%/${VERSION//\//\\/}/g" ${SERVICE_HOME}/environment
   sed -i -e "s/%ROUTER_ENABLED%/${ROUTER_ENABLED//\//\\/}/g" ${SERVICE_HOME}/environment
