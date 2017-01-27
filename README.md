@@ -40,7 +40,7 @@ $ make PI_HOST=shinycandypi.local
 ### 動作確認 (RPi)
 
 ```bash
-$ VERSION=2.0.0 && rm -fr tmp && mkdir tmp && cd tmp && \
+$ VERSION=3.0.0 && rm -fr tmp && mkdir tmp && cd tmp && \
   tar zxf ~/ltepi2-service-${VERSION}.tgz
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ./install.sh
