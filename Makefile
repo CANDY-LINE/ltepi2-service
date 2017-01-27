@@ -1,4 +1,4 @@
-PI_HOST ?= raspberrypi.local 
+PI_HOST ?= raspberrypi.local
 
 deploy:
 	./install.sh pack && \
