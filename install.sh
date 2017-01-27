@@ -54,12 +54,9 @@ function test_connectivity {
   fi
 }
 
-function uninstall_if_installed {
+function ask_to_unistall_if_installed {
   if [ -f "${SERVICE_HOME}/environment" ]; then
-    ${SERVICE_HOME}/uninstall.sh > /dev/null
-    systemctl daemon-reload
-    info "Existing version of ltepi2 has been uninstalled"
-    alert "Please reboot the system (enter 'sudo reboot') and run the installation command again"
+    alert "Please uninstall ltepi2-service first by 'sudo /opt/candy-line/ltepi2/uninstall.sh'"
     exit 1
   fi
 }
@@ -230,7 +227,7 @@ if [ "$1" == "pack" ]; then
 fi
 assert_root
 test_connectivity
-uninstall_if_installed
+ask_to_unistall_if_installed
 setup
 install_candy_board
 install_candy_red
