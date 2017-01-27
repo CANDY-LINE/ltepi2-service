@@ -47,7 +47,7 @@ function assert_root {
 }
 
 function test_connectivity {
-  curl --head --fail -o /dev/null https://github.com 2>&1
+  curl -s --head --fail -o /dev/null https://github.com 2>&1
   if [ "$?" != 0 ]; then
     alert "Internet connection is required"
     exit 1
