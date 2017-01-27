@@ -4,7 +4,7 @@ VENDOR_HOME=/opt/candy-line
 
 SERVICE_NAME=ltepi2
 GITHUB_ID=CANDY-LINE/ltepi2-service
-VERSION=2.0.0
+VERSION=3.0.0
 BOOT_APN=${BOOT_APN:-umobile.jp}
 
 NODEJS_VERSIONS="v4"
@@ -47,19 +47,16 @@ function assert_root {
 }
 
 function test_connectivity {
-  curl --head --fail -o /dev/null https://github.com 2>&1
+  curl -s --head --fail -o /dev/null https://github.com 2>&1
   if [ "$?" != 0 ]; then
     alert "Internet connection is required"
     exit 1
   fi
 }
 
-function uninstall_if_installed {
+function ask_to_unistall_if_installed {
   if [ -f "${SERVICE_HOME}/environment" ]; then
-    ${SERVICE_HOME}/uninstall.sh > /dev/null
-    systemctl daemon-reload
-    info "Existing version of ltepi2 has been uninstalled"
-    alert "Please reboot the system (enter 'sudo reboot') and run the installation command again"
+    alert "Please uninstall ltepi2-service first by 'sudo /opt/candy-line/ltepi2/uninstall.sh'"
     exit 1
   fi
 }
@@ -186,6 +183,7 @@ function install_service {
 
   mkdir -p ${SERVICE_HOME}
   cp -f ${SRC_DIR}/systemd/boot-apn.${BOOT_APN}.json ${SERVICE_HOME}/boot-apn.json
+  cp -f ${SRC_DIR}/systemd/boot-ip.*.json ${SERVICE_HOME}
   cp -f ${SRC_DIR}/systemd/environment.txt ${SERVICE_HOME}/environment
   sed -i -e "s/%VERSION%/${VERSION//\//\\/}/g" ${SERVICE_HOME}/environment
   sed -i -e "s/%ROUTER_ENABLED%/${ROUTER_ENABLED//\//\\/}/g" ${SERVICE_HOME}/environment
@@ -229,7 +227,7 @@ if [ "$1" == "pack" ]; then
 fi
 assert_root
 test_connectivity
-uninstall_if_installed
+ask_to_unistall_if_installed
 setup
 install_candy_board
 install_candy_red

@@ -43,7 +43,7 @@ $ make PI_HOST=shinycandypi.local
 $ VERSION=2.0.0 && rm -fr tmp && mkdir tmp && cd tmp && \
   tar zxf ~/ltepi2-service-${VERSION}.tgz
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
-$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ROUTER_ENABLED=0 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ROUTER_ENABLED=0 LTE_PING_INTERVAL_SEC=5 ./install.sh
 
@@ -51,6 +51,9 @@ $ time sudo /opt/candy-line/ltepi2/uninstall.sh
 ```
 
 # 履歴
+* 3.0.0
+    - ラズパイのIPアドレスを起動時に設定する仕組みを追加（Windows7以降とmacOS向け設定も追加）
+    - インストール済みの状態でさらにインストールを実施した時には、アンインストールを手動で実行するように変更。インストールでアンインストールだけが行われるという一貫性のない動きになってしまうため。
 * 2.0.0
     - PPPモデムモードを上級者向けの高度な機能として追加
     - CANDY-REDをインストールする場合に、Node.js v4.xをインストールするように変更。Node-RED v0.16.0より Node.js v0.12がサポート外となったため。**すでにv0.12が入っている場合はアンインストールされて、入れ替えられます。ご注意ください**
