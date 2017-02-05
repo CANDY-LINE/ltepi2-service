@@ -4,7 +4,7 @@ VENDOR_HOME=/opt/candy-line
 
 SERVICE_NAME=ltepi2
 GITHUB_ID=CANDY-LINE/ltepi2-service
-VERSION=3.0.0
+VERSION=3.0.1
 BOOT_APN=${BOOT_APN:-umobile.jp}
 
 NODEJS_VERSIONS="v4"
