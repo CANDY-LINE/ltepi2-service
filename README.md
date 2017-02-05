@@ -44,6 +44,7 @@ $ VERSION=3.0.0 && rm -fr tmp && mkdir tmp && cd tmp && \
   tar zxf ~/ltepi2-service-${VERSION}.tgz
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp PRESERVE_APN=1 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ROUTER_ENABLED=0 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ROUTER_ENABLED=0 LTE_PING_INTERVAL_SEC=5 ./install.sh
 
@@ -51,6 +52,8 @@ $ time sudo /opt/candy-line/ltepi2/uninstall.sh
 ```
 
 # 履歴
+* ?.?.?
+    - `boot-apn.json`ファイルを削除しないようにするための設定`PRESERVE_APN=1`を追加
 * 3.0.0
     - ラズパイのIPアドレスを起動時に設定する仕組みを追加（Windows7以降とmacOS向け設定も追加）
     - インストール済みの状態でさらにインストールを実施した時には、アンインストールを手動で実行するように変更。インストールでアンインストールだけが行われるという一貫性のない動きになってしまうため。
