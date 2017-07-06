@@ -75,7 +75,7 @@ class Pinger(threading.Thread):
                                        (Pinger.DEST_ADDR, Pinger.DEST_PORT))
                     time.sleep(self.interval_sec)
                     self.last_tx_bytes = int(self.tx_bytes)
-            except:
+            except Exception:
                 time.sleep(self.interval_sec)
                 pass
 
@@ -138,7 +138,7 @@ class Monitor(threading.Thread):
                                             shell=True)
                 time.sleep(5)
 
-            except:
+            except Exception:
                 logger.error("Error on monitoring")
                 if not self.terminate():
                     continue
