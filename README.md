@@ -40,7 +40,7 @@ $ make PI_HOST=shinycandypi.local
 ### 動作確認 (RPi)
 
 ```bash
-$ VERSION=3.0.1 && rm -fr tmp && mkdir tmp && cd tmp && \
+$ VERSION=3.0.2 && rm -fr tmp && mkdir tmp && cd tmp && \
   tar zxf ~/ltepi2-service-${VERSION}.tgz
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ./install.sh
@@ -52,6 +52,8 @@ $ time sudo /opt/candy-line/ltepi2/uninstall.sh
 ```
 
 # 履歴
+* 3.0.2
+    - UARTピンに不要な設定をしていた箇所を削除
 * 3.0.1
     - `boot-apn.json`ファイルを削除しないようにするための設定`PRESERVE_APN=1`を追加
 * 3.0.0
