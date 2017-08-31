@@ -124,6 +124,7 @@ function install_candy_red {
     return
   fi
   NODEJS_VER=`node -v`
+  NPM_VER=`npm -v`
   if [ "$?" == "0" ]; then
     for v in ${NODEJS_VERSIONS}
     do
