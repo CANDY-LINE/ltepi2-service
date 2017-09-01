@@ -43,10 +43,10 @@ $ make PI_HOST=shinycandypi.local
 $ VERSION=3.0.2 && rm -fr tmp && mkdir tmp && cd tmp && \
   tar zxf ~/ltepi2-service-${VERSION}.tgz
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
-$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ./install.sh
-$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp PRESERVE_APN=1 ./install.sh
-$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ROUTER_ENABLED=0 ./install.sh
-$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ROUTER_ENABLED=0 LTE_PING_INTERVAL_SEC=5 ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=soracom.io./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=soracom.io PRESERVE_APN=1 ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=soracom.io ROUTER_ENABLED=0 ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=soracom.io ROUTER_ENABLED=0 LTE_PING_INTERVAL_SEC=5 ./install.sh
 
 $ time sudo /opt/candy-line/ltepi2/uninstall.sh
 ```
