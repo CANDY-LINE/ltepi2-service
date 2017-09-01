@@ -53,7 +53,7 @@ $ time sudo /opt/candy-line/ltepi2/uninstall.sh
 
 # 履歴
 * 3.0.3
-    - dhcpcdが無効にされた時に、LTEモジュールへのdefault routeが追加されない問題を修正
+    - LTEモジュールへのdefault routeが存在しないとき、自動的に追加されない問題を修正
 
 * 3.0.2
     - UARTピンに不要な設定をしていた箇所を削除
