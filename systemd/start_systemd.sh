@@ -191,7 +191,26 @@ function register_usbserial {
   fi
 }
 
+function modem_on {
+  MODEM_ON=1
+  RET=`lsusb | grep 1ecb:0208`
+  if [ "$?" == "0" ]; then
+    MODEM_ON=0
+  else
+    RET=`lsusb | grep 1ecb:0202`
+    if [ "$?" == "0" ]; then
+      MODEM_ON=0
+    fi
+  fi
+  if [ "${MODEM_ON}" == "1" ]; then
+    log "Turning Modem ON..."
+    /opt/candy-line/${PRODUCT_DIR_NAME}/_modem_on.sh > /dev/null 2>&1
+    sleep 9
+  fi
+}
+
 function diagnose_self {
+  log "Diagnosing modem..."
   wait_for_modem_usb_active
   if [ -z "${MODEM_USB_MODE}" ]; then
     return
@@ -387,7 +406,7 @@ log "Initializing ${PRODUCT}..."
 . /opt/candy-line/${PRODUCT_DIR_NAME}/_pin_settings.sh > /dev/null 2>&1
 export LED2
 
-/opt/candy-line/${PRODUCT_DIR_NAME}/_modem_on.sh > /dev/null 2>&1
+modem_on
 diagnose_self
 activate_lte
 

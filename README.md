@@ -40,18 +40,21 @@ $ make PI_HOST=shinycandypi.local
 ### 動作確認 (RPi)
 
 ```bash
-$ VERSION=3.0.2 && rm -fr tmp && mkdir tmp && cd tmp && \
+$ VERSION=3.0.3 && rm -fr tmp && mkdir tmp && cd tmp && \
   tar zxf ~/ltepi2-service-${VERSION}.tgz
 $ time sudo SRC_DIR=$(pwd) DEBUG=1 ./install.sh
-$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ./install.sh
-$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp PRESERVE_APN=1 ./install.sh
-$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ROUTER_ENABLED=0 ./install.sh
-$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=lte-d.ocn.ne.jp ROUTER_ENABLED=0 LTE_PING_INTERVAL_SEC=5 ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=soracom.io./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=soracom.io PRESERVE_APN=1 ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=soracom.io ROUTER_ENABLED=0 ./install.sh
+$ time sudo SRC_DIR=$(pwd) DEBUG=1 CANDY_RED=0 BOOT_APN=soracom.io ROUTER_ENABLED=0 LTE_PING_INTERVAL_SEC=5 ./install.sh
 
 $ time sudo /opt/candy-line/ltepi2/uninstall.sh
 ```
 
 # 履歴
+* 3.0.3
+    - dhcpcdが無効にされた時に、LTEモジュールへのdefault routeが追加されない問題を修正
+
 * 3.0.2
     - UARTピンに不要な設定をしていた箇所を削除
 * 3.0.1

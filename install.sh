@@ -4,7 +4,7 @@ VENDOR_HOME=/opt/candy-line
 
 SERVICE_NAME=ltepi2
 GITHUB_ID=CANDY-LINE/ltepi2-service
-VERSION=3.0.2
+VERSION=3.0.3
 BOOT_APN=${BOOT_APN:-umobile.jp}
 
 NODEJS_VERSIONS="v4"
@@ -124,6 +124,7 @@ function install_candy_red {
     return
   fi
   NODEJS_VER=`node -v`
+  NPM_VER=`npm -v`
   if [ "$?" == "0" ]; then
     for v in ${NODEJS_VERSIONS}
     do
