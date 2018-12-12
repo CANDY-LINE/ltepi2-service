@@ -282,7 +282,19 @@ function activate_lte {
       IF_NAME=`dmesg | grep " ${USB_ID}" | grep "register 'cdc_ether'" | cut -f 2 -d ':' | cut -f 2 -d ' ' | tail -1`
     fi
     if [ -n "${IF_NAME}" ]; then
-      ifconfig ${IF_NAME} up
+      IFUP_MAX=30
+      IFUP_COUNTER=0
+      while [ ${IFUP_COUNTER} -lt ${IFUP_MAX} ];
+      do
+        log "[INFO] Trying to perform ifconfig ${IF_NAME} up...(Trial:$((IFUP_COUNTER+1))/${IFUP_MAX})"
+        ifconfig ${IF_NAME} up
+        if [ "$?" == "0" ]; then
+          log "[INFO] ifconfig ${IF_NAME} up => OK"
+          break
+        fi
+        sleep 1
+        let IFUP_COUNTER=IFUP_COUNTER+1
+      done
       RET=`which udhcpc`
       RET=$?
       if [ "${RET}" == "0" ]; then
